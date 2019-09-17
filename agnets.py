@@ -89,7 +89,7 @@ class agent_player:
         self.ctr_move+=1
         speed_addition = self.policy_object.get_action(state,self.name_id)
         my_action = action_drive(speed_addition ,state)
-        my_action.apply_action(self.name_id)
+        my_action.execute_action(self.name_id)
         return
 
     def random_policy(self):

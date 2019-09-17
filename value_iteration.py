@@ -49,11 +49,12 @@ class value_iteration_object:
         we want the expecation of this number
         '''
         i=0
+        print ("update_table....")
         action_a = action_drive(None,None)
         acc_diff=0
         size_states = len(self.map_state)
         for ky in self.map_state:
-            print (i)
+            #print (i)
             i += 1
             entry = self.map_state[ky]
             v = self.matrix_v[entry]

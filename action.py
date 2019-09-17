@@ -13,6 +13,10 @@ class action_drive:
     def set_state(self,state):
         self.cur_state=state
 
+    def execute_action(self,id_p):
+        self.stochastic_action(id_p)
+        self.apply_action(id_p)
+
     def stochastic_action(self,player_id):
         if str(player_id).__contains__('B'):
             d={}
@@ -25,16 +29,12 @@ class action_drive:
             population = list(d.keys())
             weights = list(d.values())
             a = choices(population, weights)
-            print (a[0])
             self.speed_to_add=a[0]
 
     def cost_function(self):
         pass
 
     def apply_action(self,agent_id):
-
-        self.stochastic_action(agent_id)
-
         new_speed = self.change_speed(agent_id)
         pos_cur = self.cur_state.get_agent_position(agent_id)
         new_pos = [pos_cur[i] + new_speed[i] for i in range(len(new_speed))]
