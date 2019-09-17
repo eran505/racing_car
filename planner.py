@@ -2,10 +2,10 @@
 
 
 
-def reward_func(agent_in,info,string,gurd_symbol='B'):
+def reward_func(agent_in,info,string,reward,gurd_symbol='B'):
     if string == 'goal':
         for agent_i in agent_in[gurd_symbol]:
-            agent_i.update_reward(-10)
+            agent_i.update_reward(reward)
 
     if string == 'collusion':
         for collusion_i in info:
@@ -13,10 +13,10 @@ def reward_func(agent_in,info,string,gurd_symbol='B'):
                 if item['team'] == gurd_symbol:
                     for agent_i in agent_in[gurd_symbol]:
                         if agent_i.get_id() == item['p']:
-                            agent_i.update_reward(10)
+                            agent_i.update_reward(reward)
 
     if string == 'wall':
-        agent_in.update_reward(-1)
+        agent_in.update_reward(reward)
 
 
 

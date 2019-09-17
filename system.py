@@ -18,6 +18,7 @@ class system_game:
         self.grid_bord=None
         self.agents_list=None
         self.agents={}
+        self.history=[]
         self.agents_out=[]
         self.agents_in={}
         self.current_state=None
@@ -204,7 +205,7 @@ class system_game:
                 for agent_p in collusion_i:
                     agent_obj = self.id_to_agents([agent_p['p']])[0]
 
-                    reward_func(self.agents_in,agentz,'collusion')
+                    reward_func(self.agents_in,agentz,'collusion',self.current_state.coll_reward)
 
                     self.remove_agent(agent_obj)
             print ('collusion!!')
@@ -215,7 +216,7 @@ class system_game:
         if agentz is not None:
             print('at the goal!!')
             agents_objects = self.id_to_agents(agentz)
-            reward_func(self.agents_in, agentz, 'goal')
+            reward_func(self.agents_in, agentz, 'goal',self.current_state.goal_reward)
             for obj_player in agents_objects :
                 self.remove_agent(obj_player)
 
@@ -256,6 +257,7 @@ class system_game:
             self.print_state()
             print (self.current_state)
             #print ('\n')
+            self.history.append(str(self.current_state))
             for symbol in self.agents_in:
                 if is_end:
                     break
@@ -266,7 +268,7 @@ class system_game:
                     agent_i.play(self.current_state)
                     #valid move
                     if self.check_valid_move() is False:
-                        reward_func(agent_i,None,'wall')
+                        reward_func(agent_i,None,'wall',self.current_state.wall_reward)
                         self.rollback()
                     self.check_reward()
                     is_removed,info = self.check_conditions()
@@ -284,6 +286,7 @@ class system_game:
         return info,ctr_rounds
 
     def start_episode(self):
+        self.history=[]
         self.agents_in=copy.deepcopy(self.agents)
         self.agents_out=[]
         for sym in self.agents_in:
@@ -291,25 +294,34 @@ class system_game:
                 p.reset_agent()
         self.set_starting_state()
 
-    def loop_game(self,num_of_epsidoe=300):
+    def loop_game(self,num_of_epsidoe=1):
         d_l=[]
         for i in range(num_of_epsidoe):
             self.start_episode()
             info, ctr_rounds = self.start_game()
-            d_l.append({'round':ctr_rounds,'end':info})
+            d_l.append({'round':ctr_rounds,'end':info,'history':" / ".join(self.history)})
         df = pd.DataFrame(d_l)
         df['collusion']= np.where(df['end']=='collusion', 1, 0)
         df['goal'] = np.where(df['end'] == 'goal', 1, 0)
         df['budget'] = np.where(df['end'] == 'budget', 1, 0)
 
         print (df.to_string())
-        df.to_csv('{}/{}.csv'.format('/home/ise/car_model',time.strftime("%m_%d_%H_%M_%S")))
+        df.to_csv('{}/{}.csv'.format('/home/ise/car_model',time.strftime("%m_%d_%H_%M_%S")),sep='\t')
 
 
 if __name__ == "__main__":
 
-    std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|value:-b|100 -B_s 1,0 -A_s 3,3'
+    std_in_string = '-x 5 -y 5 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|value:-b|100 -B_s 1,0 -A_s 4,4'
     s = system_game()
     s.init_game(std_in_string)
     s.loop_game()
+    std_in_string = '-x 6 -y 6 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|random:-b|100 -B_s 1,0 -A_s 5,5'
+    s = system_game()
+    s.init_game(std_in_string)
+    s.loop_game()
+    std_in_string = '-x 7 -y 7 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|random:-b|100 -B_s 1,0 -A_s 6,6'
+    s = system_game()
+    s.init_game(std_in_string)
+    s.loop_game()
+
     #print ("system class")

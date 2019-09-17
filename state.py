@@ -122,9 +122,9 @@ class game_state:
             p = self.player_position[ky]
             s = self.speed[ky]
             b = self.player_budget[ky]
-            str_ky = "({}_{}_{}_{})".format(ky,p,s,b)
+            str_ky = "{}_{}_{}_{}".format(ky,tuple(p),tuple(s),b)
             list_p.append(str_ky)
-        return "\t".join(list_p)
+        return "|".join(list_p)
 
     def get_deep_copy_state(self):
         #copy.deepcopy =
@@ -149,6 +149,7 @@ class game_state:
             if self.is_wall_by_id(ky):
                 return True
         return False
+
     def get_reward_by_id(self,id_player):
         results = self.check_gaol()
         if results is not None:
@@ -160,6 +161,17 @@ class game_state:
             return self.wall_reward
         return 0
 
+
+    def get_reward_by_id(self,id_player):
+        results = self.check_gaol()
+        if results is not None:
+            return self.goal_reward
+        results = self.collusion()
+        if results is not None:
+            return self.coll_reward
+        if self.is_wall_by_id(id_player):
+            return self.wall_reward
+        return 0
 
     def state_to_string_no_budget(self,budget=10):
         keyz = self.player_position.keys()
