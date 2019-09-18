@@ -294,7 +294,7 @@ class system_game:
                 p.reset_agent()
         self.set_starting_state()
 
-    def loop_game(self,num_of_epsidoe=1):
+    def loop_game(self,num_of_epsidoe=400):
         d_l=[]
         for i in range(num_of_epsidoe):
             self.start_episode()
@@ -311,15 +311,12 @@ class system_game:
 
 if __name__ == "__main__":
 
-    std_in_string = '-x 5 -y 5 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|value:-b|100 -B_s 1,0 -A_s 4,4'
+
+    std_in_string = '-x 6 -y 6 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|value:-b|100 -B_s 1,0 -A_s 5,5'
     s = system_game()
     s.init_game(std_in_string)
     s.loop_game()
-    std_in_string = '-x 6 -y 6 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|random:-b|100 -B_s 1,0 -A_s 5,5'
-    s = system_game()
-    s.init_game(std_in_string)
-    s.loop_game()
-    std_in_string = '-x 7 -y 7 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|random:-b|100 -B_s 1,0 -A_s 6,6'
+    std_in_string = '-x 7 -y 7 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|value:-b|100 -B_s 1,0 -A_s 6,6'
     s = system_game()
     s.init_game(std_in_string)
     s.loop_game()
