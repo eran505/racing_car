@@ -352,7 +352,7 @@ class system_game:
 
 if __name__ == "__main__":
 
-    std_in_string = '-x 9 -y 9 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 8,8'
+    std_in_string = '-x 9 -y 9 -G 0,0:2,0 -A -n|1:-p|short:-b|52 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 8,8'
     #std_in_string = '-x 8 -y 8 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 7,7'
     #std_in_string = '-x 5 -y 5 -G 0,0:4,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,4'
     #std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 3,0 -A_s 3,3'
