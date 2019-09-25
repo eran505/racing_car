@@ -1,14 +1,22 @@
-
-from random import choices
+from graph_policy import short_path_policy
+from random import choices,choice
 class action_drive:
 
     def __init__(self,speed,state):
         self.speed_to_add=speed
         self.cur_state = state
-        self.step_cost=-0.05
+        self.step_cost=0
         self.cost=0.5
         self.absolute_max_speed=2
         self.action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
+        self.tran={}
+
+    def set_tran(self,id_p,tran):
+        self.tran[id_p]=tran
+
+    def setter(self,speed,state):
+        self.cur_state=state
+        self.speed_to_add=speed
 
     def set_state(self,state):
         self.cur_state=state
@@ -64,18 +72,22 @@ class action_drive:
 
     def get_expected_reward(self,player_id):
         s_state = self.cur_state.get_deep_copy_state()
-        action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
+        #action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
         d_action={}
         d_wall={}
         state_reward={}
-        for action_a in action_list:
+        for action_a in self.action_list:
             self.speed_to_add=action_a
             self.cur_state = s_state.get_deep_copy_state()
             self.apply_action(player_id)
-            #r = self.cur_state.get_reward_by_id(player_id)
-            r=self.step_cost
-            bol_wall = self.cur_state.is_wall_all()
-
+            r = self.step_cost
+            r += self.cur_state.get_reward_by_state()
+            if r == self.step_cost:
+                self.tran_function()
+                r = self.cur_state.get_reward_by_state()
+            bol_wall =self.cur_state.is_wall_all()
+            if bol_wall is True:
+                r+=self.cur_state.wall_reward
             str_state=self.cur_state.state_to_string_no_budget()
             d_action[action_a]=str_state
             state_reward[str_state]=r
@@ -83,13 +95,40 @@ class action_drive:
 
         return state_reward,d_action,d_wall
 
+
+    def tran_function(self,id_roll='A1'):
+        a = short_path_policy.policy_next_step_shortest_path\
+            (self.tran[id_roll],self.cur_state.get_agent_position(id_roll),self.cur_state.get_agent_speed(id_roll))
+        self.speed_to_add=a
+        self.apply_action(id_roll)
+
     @staticmethod
     def keywithmaxval(d):
         """ a) create a list of the dict's keys and values;
             b) return the key with the max value"""
         v = list(d.values())
         k = list(d.keys())
-        return k[v.index(max(v))]
+        l=[k[0]]
+        size = len(k)
+        v_max=v[0]
+        for i in range(1,size):
+            if v_max<v[i]:
+                l=[k[i]]
+                v_max=v[i]
+            elif v_max==v[i]:
+                l.append(k[i])
+        print(l)
+        res = choice(l)
+        return res
+
 
 if __name__ == "__main__":
+    d={}
+    d[(0, 0)] = 4
+    d[(1, 0)] = 2
+    d[(2, 0)] = 3
+    d[(3, 0)] = 5
+    d[(4, 0)] = 5
+    x= action_drive.keywithmaxval(d)
+    print(x)
     pass

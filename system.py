@@ -8,18 +8,19 @@ import graph_policy as gp
 import value_iteration
 import time
 from math import sqrt,ceil
-
+import rtdp_algo
 import pandas as pd
 import numpy as np
-
+from action import action_drive
 class system_game:
 
     def __init__(self):
         self.grid_bord=None
         self.agents_list=None
         self.agents={}
+        self.action_drive_object=None
         self.history=[]
-        self.agents_out=[]
+        self.agents_out={}
         self.agents_in={}
         self.current_state=None
         self.previous_state=None
@@ -27,16 +28,19 @@ class system_game:
 
 
     def set_starting_state(self):
+        self.action_drive_object=action_drive(None,None)
         state_s = game_state()
-        for symbol_team in self.agents:
-            for agnet_i in self.agents[symbol_team]:
+        for symbol_team in self.agents_in:
+            for agnet_i in self.agents_in[symbol_team]:
                 id_agent = agnet_i.get_id()
                 state_s.set_agent_position(id_agent ,agnet_i.starting_point)
                 state_s.set_agent_speed(id_agent,(0,0))
                 state_s.set_agent_budget(id_agent,agnet_i.budget)
+                self.action_drive_object.set_tran(id_agent,agnet_i.policy_object.get_tran())
         print (state_s)
         self.current_state = state_s
         self.current_state.grid=self.grid_bord
+        self.action_drive_object.set_state(self.current_state)
         self.previous_state = None
 
 
@@ -58,6 +62,8 @@ class system_game:
         self.set_agents(aganet_info_B,start_B,'B')
         self.set_agents(aganet_info_A, start_A, 'A')
 
+        self.agents_in=self.agents
+
         #set grid
         bord = grid_puzzle('grid',int(x_size),int(y_size))
         goals_coords = util_system.str_to_point(goalz)
@@ -68,9 +74,7 @@ class system_game:
         # set point on the grid
         self.set_starting_point_grid()
 
-        # rest all agents
-        self.agents_in = copy.deepcopy(self.agents)
-        self.agents_out = []
+
 
 
         self.set_policies()
@@ -80,11 +84,31 @@ class system_game:
         #self.update()
 
 
+        # rest all agents
+        #self.agents_in = copy.deepcopy(self.agents)
+        #self.agents_in = self.agents
+
+        self.agents_out = {'A':[],'B':[]}
+
+        self.copy_agents(self.agents_in,self.agents_out)
+        self.agents_in = {'A': [], 'B': []}
         print ('-'*100)
 
+    def set_rtdp(self,agent):
+        rtdp_obj = rtdp_algo.rtdp(self.grid_bord)
+        rtdp_obj.init_policy(self.grid_bord.x_size,self.grid_bord.y_size)
+        agent.policy_object=rtdp_obj
+
+
+    def copy_agents(self,l_copy,l_dis):
+        for sym in l_copy:
+            for p in l_copy[sym ]:
+                l_dis[sym].append(p)
+
+
     def set_starting_point_grid(self):
-        for t_team in self.agents.keys():
-            for agent_i in self.agents[t_team]:
+        for t_team in self.agents_in.keys():
+            for agent_i in self.agents_in[t_team]:
                 team_i = agent_i.team
                 team_i = str(team_i).lower()
                 arr = agent_i.starting_place_list
@@ -93,6 +117,7 @@ class system_game:
 
     def set_value_itr(self,agent):
         update_num = ceil(sqrt(pow(self.grid_bord.y_size,2)+pow(self.grid_bord.x_size,2)))+1
+        update_num = 15
         print ("update_value:\t{}".format(update_num))
         v = value_iteration.value_iteration_object(self.grid_bord)
         v.init_dict_state(self.grid_bord.x_size,self.grid_bord.y_size)
@@ -108,13 +133,15 @@ class system_game:
                     self.set_policy_agent_random(agent_i)
                 elif agent_i.policy_name == 'value':
                     self.set_value_itr(agent_i)
+                elif agent_i.policy_name == 'rtdp':
+                    self.set_rtdp(agent_i)
                 agent_i.reset_agent()  # rest properties
 
     def id_to_agents(self,list_id):
         agentz=[]
         for id_i in list_id:
             team=id_i[:-1]
-            for p in self.agents[team]:
+            for p in self.agents_in[team]:
                 if p.name_id == id_i:
                     agentz.append(p)
         return agentz
@@ -155,9 +182,8 @@ class system_game:
     def remove_agent(self,player):
         team = player.get_team()
         self.agents_in[team].remove(player.get_id())
-        print(str(player),'|\tremoved')
-
-        self.agents_out.append(player)
+        #print(str(player),'|\tremoved')
+        self.agents_out[player.get_team()].append(player)
         self.current_state.dead_player_position(player.get_id())
 
     def end_game(self):
@@ -178,6 +204,7 @@ class system_game:
 
     def print_state(self):
         self.grid_bord.print_state(self.current_state.player_position,self.current_state.dead_state)
+
 
 
     def check_conditions(self):
@@ -249,23 +276,24 @@ class system_game:
     def check_reward(self):
         pass
 
-    def start_game(self):
+    def start_game(self,policy_eval):
+
         is_end = False
         info=None
         ctr_rounds=0
         while True:
-            self.print_state()
-            print (self.current_state)
             #print ('\n')
             self.history.append(str(self.current_state))
             for symbol in self.agents_in:
+                self.print_state()
+                print(self.current_state)
                 if is_end:
                     break
                 for agent_i in self.agents_in[symbol]:
                     # deep copying the sate for rollback
                     self.previous_state = self.current_state.get_deep_copy_state()
 
-                    agent_i.play(self.current_state)
+                    agent_i.play(self.current_state,policy_eval,self.action_drive_object)
                     #valid move
                     if self.check_valid_move() is False:
                         reward_func(agent_i,None,'wall',self.current_state.wall_reward)
@@ -275,6 +303,8 @@ class system_game:
                     if is_removed:
                         if self.end_game():
                             is_end=True
+                            self.history.append(str(self.current_state))
+                            print ("END STATE:\t",str(self.current_state))
                             break
 
             ctr_rounds+=1
@@ -287,36 +317,47 @@ class system_game:
 
     def start_episode(self):
         self.history=[]
-        self.agents_in=copy.deepcopy(self.agents)
-        self.agents_out=[]
+        self.copy_agents(self.agents_out,self.agents_in)
+        self.agents_out={'A':[],'B':[]}
+
         for sym in self.agents_in:
             for p in self.agents_in[sym]:
                 p.reset_agent()
         self.set_starting_state()
 
-    def loop_game(self,num_of_epsidoe=400):
-        d_l=[]
-        for i in range(num_of_epsidoe):
+    def loop_game(self,num_of_epsidoe=1000010):
+        d_list=[]
+        for i in range(1,num_of_epsidoe):
+            if i%5000==0:
+                sum_col,sum_goal,avg_round = self.eval_policy(i)
+                d_list.append({'iter': i, 'sum_collusion':sum_col, 'sum_goal':sum_goal,'avg_round':avg_round})
             self.start_episode()
-            info, ctr_rounds = self.start_game()
-            d_l.append({'round':ctr_rounds,'end':info,'history':" / ".join(self.history)})
+            info, ctr_rounds = self.start_game(policy_eval=False)
+            print ('num_of_epsidoe:\t',i)
+        df_fin =pd.DataFrame(d_list)
+        df_fin.to_csv('{}/fin_{}.csv'.format('/home/ise/car_model',time.strftime("%m_%d_%H_%M_%S")), sep='\t')
+
+    def eval_policy(self,iter_num,num_of_iteration=500):
+        d_l = []
+        for i in range(num_of_iteration):
+            self.start_episode()
+            info, ctr_rounds = self.start_game(policy_eval=True)
+            d_l.append({'round': ctr_rounds, 'end': info, 'history': " / ".join(self.history)})
         df = pd.DataFrame(d_l)
-        df['collusion']= np.where(df['end']=='collusion', 1, 0)
+        df['collusion'] = np.where(df['end'] == 'collusion', 1, 0)
         df['goal'] = np.where(df['end'] == 'goal', 1, 0)
         df['budget'] = np.where(df['end'] == 'budget', 1, 0)
-
-        print (df.to_string())
-        df.to_csv('{}/{}.csv'.format('/home/ise/car_model',time.strftime("%m_%d_%H_%M_%S")),sep='\t')
-
+        df.to_csv('{}/i_{}_{}.csv'.format('/home/ise/car_model',iter_num,time.strftime("%m_%d_%H_%M_%S")), sep='\t')
+        return df['collusion'].sum(),df['goal'].sum(),df['round'].mean()
 
 if __name__ == "__main__":
 
+    std_in_string = '-x 9 -y 9 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 8,8'
+    #std_in_string = '-x 8 -y 8 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 7,7'
+    #std_in_string = '-x 5 -y 5 -G 0,0:4,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,4'
+    #std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 3,0 -A_s 3,3'
+    #std_in_string = '-x 3 -y 3 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,2'
 
-    std_in_string = '-x 6 -y 6 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|value:-b|100 -B_s 1,0 -A_s 5,5'
-    s = system_game()
-    s.init_game(std_in_string)
-    s.loop_game()
-    std_in_string = '-x 7 -y 7 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|value:-b|100 -B_s 1,0 -A_s 6,6'
     s = system_game()
     s.init_game(std_in_string)
     s.loop_game()

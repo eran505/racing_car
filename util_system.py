@@ -24,6 +24,9 @@ def str_to_point(str_point,split_by=':'):
         array_pint.append(tuple(arr))
     return array_pint
 
+
+
+
 if __name__ == "__main__":
     print ('--util--')
     #std_in_string = '-x 10 -y 9 -G 0,0:0,8 -A 1:random -B 1:random -B_s 1,1 -A_s 8,0'

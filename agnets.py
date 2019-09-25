@@ -85,11 +85,11 @@ class agent_player:
             self.policy_object = short_path_policy(pathz)
 
 
-    def play(self,state):
+    def play(self,state,policy_eval,action_obj):
         self.ctr_move+=1
-        speed_addition = self.policy_object.get_action(state,self.name_id)
-        my_action = action_drive(speed_addition ,state)
-        my_action.execute_action(self.name_id)
+        speed_addition = self.policy_object.get_action(state,self.name_id,policy_eval,action_obj)
+        action_obj.setter(speed_addition ,state)
+        action_obj.execute_action(self.name_id)
         return
 
     def random_policy(self):
@@ -97,3 +97,6 @@ class agent_player:
         y_xias = randint(-1, 1)
         #return  [-1,-1]
         return [x_axis,y_xias]
+
+
+

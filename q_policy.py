@@ -27,7 +27,7 @@ class short_path_policy:
         self.cum_td_error = 0
         self.ctr_num_update=0
 
-    def get_action(self,state,id_agnet):
+    def get_action(self,state,id_agnet,policy_eval):
         a = self.e_greedy_policy(str(state))
         return a
 

@@ -61,6 +61,7 @@ class game_state:
     def state_rollback_exclude_budget(self,state_old):
         self.player_position = copy.deepcopy(state_old.player_position)
         self.speed = copy.deepcopy(state_old.speed)
+        self.set_agent_speed('B1',(0,0))
 
     def budget_checking(self):
         out_of_budget_list=[]
@@ -162,15 +163,13 @@ class game_state:
         return 0
 
 
-    def get_reward_by_id(self,id_player):
+    def get_reward_by_state(self):
         results = self.check_gaol()
         if results is not None:
             return self.goal_reward
         results = self.collusion()
         if results is not None:
             return self.coll_reward
-        if self.is_wall_by_id(id_player):
-            return self.wall_reward
         return 0
 
     def state_to_string_no_budget(self,budget=10):

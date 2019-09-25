@@ -2,6 +2,8 @@ import numpy as np
 from itertools import product
 from itertools import product
 
+from planner import construct_map_state
+
 import state
 from action import action_drive
 class value_iteration_object:
@@ -16,12 +18,12 @@ class value_iteration_object:
         self.players= ['B1','A1']
         self.transition_prob=0.9
         self.action_wind = (0,0)
-        self.discount_factor=float(1)
+        self.discount_factor=float(0.6)
         self.epsilon = 0.0001
 
 
 
-    def get_action(self,state,id_agent):
+    def get_action(self,state,id_agent,policy_eval):
         a = self.greedy_action(state,id_agent)
         #return [0,0]
         return a
@@ -119,45 +121,10 @@ class value_iteration_object:
                 , '(1,1)': 4, '(1,-1)': 5, '(-1,0)': 6, '(-1,1)': 7, '(-1,-1)': 8}
 
 
-    def init_dict_state_helper(self,x,y,max_speed=2):
-        ctr=0
-        list_player=[]
-        for x_i in range(x):
-            for y_i in range(y):
-                for s_x in range(-max_speed,max_speed+1):
-                    for s_y in range(-max_speed,max_speed+1):
-                        for b in range(10,11):
-                            str_state =  ("{}_{}_{}".format((x_i,y_i),(s_x,s_y),b))
-                            # if str_state == "{}_{}_{}".format((0,1),(0,1),10):
-                            #     print ('y1')
-                            # if str_state == "{}_{}_{}".format((0, 1),(-2, -2),10):
-                            #     print ('y2')
-                            list_player.append(str_state)
-                            ctr+=1
-        print("ctr= ",ctr)
-        return list_player
-
     def init_dict_state(self,x,y,max_speed=2,num_players=2):
         self.init_matrix(x,y,num_players)
-        list_of_stae = self.init_dict_state_helper(x,y,max_speed)
-        states_list = list(product(list_of_stae, repeat=num_players))
-        print (len(list_of_stae))
-        print (len(states_list ))
-
-        for state in states_list:
-            #print (str(state))
-            # if state == ("{}_{}_{}".format((0,1),(0,1),10),"{}_{}_{}".format((0, 1),(-2, -2),10)):
-            #     print('in')
-            # if state == ("{}_{}_{}".format((0,0),(-2,-2),10),"{}_{}_{}".format((0,0),(-2,-2),10)):
-            #     print('iin')
-            state_i=[None]*num_players
-            for p in range(len(self.players)):
-                state_i[p] = "{}_{}".format(self.players[p],state[p])
-            state_str = '|'.join(state_i)
-            self.map_state[state_str]=self.ctr_state
-            self.ctr_state+=1
+        self.map_state= construct_map_state(x,y,max_speed,num_players,self.players)
         self.state_absorbed()
-        print()
 
     def state_absorbed(self):
         d_goal={}

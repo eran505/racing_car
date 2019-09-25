@@ -64,6 +64,25 @@ def get_short_path_from_grid(grid,s,e):
 
 
 
+
+class dog:
+
+    def __init__(self):
+        self.graph=None
+
+    def rest(self,info):
+        pass
+
+    def get_action(self,state,id_agnet,action_obj,policy_eval):
+        pass
+
+    def get_tran(self):
+        return None
+
+
+
+
+
 class short_path_policy:
 
     def __init__(self,paths):
@@ -76,7 +95,7 @@ class short_path_policy:
         self.starting_p = dict_info['start']
         self.choose_policy_path()
 
-    def get_action(self,state,id_agnet):
+    def get_action(self,state,id_agnet,action_obj,policy_eval):
         cur_pos = state.get_agent_position(id_agnet)
         speed_cur = state.get_agent_speed(id_agnet)
         return short_path_policy.policy_next_step_shortest_path\
@@ -92,8 +111,12 @@ class short_path_policy:
         ky_number_goal = random.randint(0,size_goalz-1)
         all_path = pathz[list_of_goal[ky_number_goal]]
         randomindex = random.randint(0, len(all_path) - 1)
+        #randomindex=0
         choosen = all_path[randomindex]
         self.policy_path=choosen
+
+    def get_tran(self):
+        return self.policy_path
 
     @staticmethod
     def policy_next_step_shortest_path(path,cur_pos,speed):
