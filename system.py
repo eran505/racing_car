@@ -402,7 +402,7 @@ if __name__ == "__main__":
     #std_in_string = '-x 5 -y 5 -G 0,0:4,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,4'
     #std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 3,0 -A_s 3,3'
     #std_in_string = '-x 3 -y 3 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,2'
-    std_in_string = '-x 13 -y 13 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|dog:-b|100 -B_s 2,0 -A_s 12,12'
+    #std_in_string = '-x 13 -y 13 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|dog:-b|100 -B_s 2,0 -A_s 12,12'
 
 
     s = system_game()
