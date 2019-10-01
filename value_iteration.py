@@ -114,6 +114,7 @@ class value_iteration_object:
 
 
 
+
     def init_matrix(self,x,y,num_agents,action_size=9,speed_state=25,dead_state=1,max_b=30):
             state_size_overall = pow(((x*y)+dead_state)*speed_state*max_b,num_agents)
             self.matrix_v = np.zeros(state_size_overall)

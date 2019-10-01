@@ -3,10 +3,13 @@ from time import time
 from planner import init_dict_state_helper,construct_map_state
 import numpy as np
 import state
+from random import choice
+
 from action import action_drive
 class rtdp:
 
     def __init__(self,grid):
+        self.history=[]
         self.name='RTDP'
         self.matrix_q=None
         self.players = ['A1','B1']
@@ -17,22 +20,27 @@ class rtdp:
         self.ctr_insert_state=0
         self.grid=grid
         self.map_state=None
-        self.heuristic_value_upper_bound = 10.0
+        self.heuristic_value_upper_bound = 10.1
         self.transaction_action=None
         self.action_map=None
         self.sum_tran_p=None
         self.size_action=-1
         self.transitions=None
+        self.action_map_rev=None
+        self.tmp_d = None
+        self.default_actions=[]
         self.init_action_map()
-
     def init_action_map(self):
         self.action_map =\
             {(0,0): 0, (0,1): 1, (0,-1): 2, (1,0): 3
             , (1,1): 4, (1,-1): 5, (-1,0): 6, (-1,1): 7, (-1,-1): 8}
+
+        self.action_map_rev = {v: k for k, v in self.action_map .items()}
         self.transaction_action=np.zeros(len(self.action_map))
         self.transaction_action[self.action_map[(0,0)]]=0.1
         self.sum_tran_p = np.sum(self.transaction_action)
         self.size_action = len(self.action_map)
+        self.default_actions = [(0,0)]
 
 
     def full_init(self,x,y,num_agents,max_speed,full,max_b=1):
@@ -56,13 +64,15 @@ class rtdp:
 
     def rest(self,obj):
         pass
+
+
     def get_tran(self):
         return None
 
     def up_date_q_observing(self,string_i,reward):
         for state_i in self.state_absorbed_map[string_i]:
             entry_q = self.map_state[state_i]
-            self.matrix_q[entry_q,:]=reward
+            self.matrix_q[entry_q, :]=np.full((self.size_action),reward)
 
 
 
@@ -82,14 +92,65 @@ class rtdp:
         self.up_date_q_observing('collusion', obj_state.coll_reward)
 
 
-    def get_action(self,state,player_id,policy_eval,action_object):
+
+    def update_q_value(self,action_object,s_state):
+        expected_retrun_value = action_object.expected_return_reward(s_state)
+        acc=0.0
+        for tuple in expected_retrun_value :
+            q_val = np.amax(self.matrix_q[self.map_state[tuple[1]],:])
+            acc+=tuple[0]*q_val
+        return acc
+
+
+    def update_policy(self,s_old,r,a,r_new,action_obj):
+        # print("update_policy")
+        # print (s_old)
+        # print(a)
+        # old_state_entry = self.map_state[s_old.state_to_string_no_budget()]
+        # action_entry = self.action_map[a]
+        # print(self.matrix_q[old_state_entry ,:])
+        # for a_i in self.action_map:
+        #     self.matrix_q[old_state_entry , self.action_map[a_i]] = self.tmp_d[a_i]
+        # print(self.matrix_q[old_state_entry, :])
+
+        #self.history.append((s_old.state_to_string_no_budget(),a,self.tmp_d[a]))
+
+        return True
+
+    def get_action_all(self,state,player_id,policy_eval,action_object):
         action_a = action_object
-        state_reward, d_action, d_wall = action_a.get_expected_reward(player_id)
-        a = self.greedy_action_taking(state,state_reward, d_action, d_wall,policy_eval)
-        print("a= ",a)
+        dict_action_info = action_a.get_expected_reward(player_id)
+        a = self.greedy_action_taking(state,dict_action_info,policy_eval)
         return a
 
-    def greedy_action_taking(self, state_cur, state_reward ,d_action, d_wall,policy_eval):
+    def get_max_action(self,state_cur):
+        cur_str_state = state_cur.state_to_string_no_budget()
+        entry_q = self.map_state[cur_str_state]
+        ## TODO:
+        #c = [np.random.choice(np.flatnonzero(b == b.max())) for i in range(100000)]
+        #action_entry = np.argmax()
+
+        arg_max_list = np.argwhere(self.matrix_q[entry_q, :]  == np.amax(self.matrix_q[entry_q, :]))
+        winner = arg_max_list.flatten().tolist()
+        if len(winner)==1:
+            return self.action_map_rev[winner[0]]
+
+        a_entry = choice(winner)
+        return self.action_map_rev[a_entry]
+
+
+
+    def get_action(self,state,player_id,policy_eval,action_a):
+        #a = self.get_max_action(state)
+        #return a
+        #if policy_eval is True:
+        #    return aget_next_state
+        action_a.set_state(state)
+        dict_action_info = action_a.get_expected_reward(player_id)
+        a = self.greedy_action_taking(state,dict_action_info,policy_eval)
+        return a
+
+    def greedy_action_taking(self, state_cur, d_action ,policy_eval):
         '''
         Q(S,A) = R(S,A)+ discount*T(S'|S,A)*V(S')
         V(S)=max_a{Q(S,A)}
@@ -101,47 +162,54 @@ class rtdp:
         vector = np.zeros((self.size_action))
         for action_a in d_action:
             action_entry = self.action_map[action_a]
-            state_s = d_action[action_a]
-            if d_wall[state_s]:
-                q_value = state_cur.wall_reward
-            else:
+            state_s_list = d_action[action_a][0]
+            size_l = len(state_s_list)
+            vector_i = np.zeros((size_l))
+            tran_vec = np.zeros((size_l))
+            ctr=0
+            for item in state_s_list:
+
+                state_s=item[0]
+                transition_probability=item[1]
+                tran_vec[ctr]=transition_probability
                 next_state_entry = self.map_state[state_s]
                 q_value = np.amax(self.matrix_q[next_state_entry, :])
+                vector_i[ctr] = q_value
 
-            # elif state_s in self.state_absorbed_map['goal']:
-            #     #vector[action_entry]= state_cur.goal_reward
-            #     r=state_cur.goal_reward
-            #     next_state_entry = self.map_state[state_s]
-            #     q_value = np.amax(self.matrix_q[next_state_entry, :])
-            #     #self.update_q(action_entry, entry_q, q_value*self.discounted_factor )
-            # elif state_s in self.state_absorbed_map['collusion']:
-            #     #vector[action_entry] = state_cur.coll_reward
-            #     r=state_cur.coll_reward
-            #     next_state_entry = self.map_state[state_s]
-            #     q_value = np.amax(self.matrix_q[next_state_entry, :])
-            #     #self.update_q(action_entry, entry_q, q_value*self.discounted_factor )
-            # else:
-            #     next_state_entry = self.map_state[state_s]
-            #     q_value = np.amax(self.matrix_q[next_state_entry,:])
+                # if state_s in self.state_absorbed_map['collusion']:
+                #     vector_i[ctr] = d_action[action_a][1] + q_value * self.discounted_factor
+                # elif state_s in self.state_absorbed_map['goal']:
+                #     vector_i[ctr] = d_action[action_a][1] + q_value * self.discounted_factor
+                # else:
+                #     vector_i[ctr] = q_value*self.discounted_factor + d_action[action_a][1]
+
+                ctr+=1
+            vector[action_entry]=np.dot(vector_i,tran_vec)
 
 
-            if state_reward[state_s] != 0 :
-                vector[action_entry] =  state_reward[state_s]
-            else:
-                vector[action_entry] = q_value * self.discounted_factor + state_reward[state_s]
+        vector = vector*self.discounted_factor
+
 
         for ky in d_action:
             action_entry = self.action_map[ky]
             self.transaction_action[action_entry]+=(1.0-self.sum_tran_p)
-            d_expected_value[ky]=np.dot(vector,self.transaction_action)
+
+            d_expected_value[ky]= np.round(np.dot(vector,self.transaction_action),6) \
+                                   + d_action[ky][1]
             self.transaction_action[action_entry] -= (1.0 - self.sum_tran_p)
+
         arg_max_action = action_drive.keywithmaxval(d_expected_value)
 
-        # updating the Q table
-        if policy_eval is False:
-            print(self.matrix_q[entry_q, :])
-            self.update_q(self.action_map[arg_max_action],entry_q,d_expected_value[arg_max_action])
-            print (self.matrix_q[entry_q,:])
+        if policy_eval:
+            return arg_max_action
+
+        # Update
+        #print (self.matrix_q[entry_q, :])
+
+        for key_i,v_i  in d_expected_value.items():
+            self.matrix_q[entry_q , self.action_map[key_i]] = v_i
+
+        #print(self.matrix_q[entry_q,:])
 
         return arg_max_action
 
@@ -150,14 +218,13 @@ class rtdp:
         self.matrix_q[state_entry,action_entry]= q_new_val
 
 
-
 if __name__ == "__main__":
-    print ('RTDP')
+    #print ('RTDP')
 
+    arr2D = np.array(   [[11, 12, 13,11, 12, 13],
+                         [14, 15, 16,11, 12, 13],
+                         [17, 15, 11,11, 12, 13],
+                         [15, 14, 15,11, 12, 15]])
 
-    arr2D = np.array(   [[11, 12, 13],
-                         [14, 15, 16],
-                         [17, 15, 11],
-                         [12, 14, 15]])
-
-    print ( np.amax(arr2D[1,:]))
+    print (np.round((1/float(3)*7+1/float(3)*7+1/float(3)*7),5))
+    print ( np.amax(arr2D[3,:]))

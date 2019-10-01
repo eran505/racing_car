@@ -37,7 +37,7 @@ class system_game:
                 state_s.set_agent_speed(id_agent,(0,0))
                 state_s.set_agent_budget(id_agent,agnet_i.budget)
                 self.action_drive_object.set_tran(id_agent,agnet_i.policy_object.get_tran())
-        print (state_s)
+        #print (state_s)
         self.current_state = state_s
         self.current_state.grid=self.grid_bord
         self.action_drive_object.set_state(self.current_state)
@@ -133,6 +133,8 @@ class system_game:
                     self.set_policy_agent_random(agent_i)
                 elif agent_i.policy_name == 'value':
                     self.set_value_itr(agent_i)
+                elif agent_i.policy_name == 'dog':
+                    agent_i.init_policy(None,'dog')
                 elif agent_i.policy_name == 'rtdp':
                     self.set_rtdp(agent_i)
                 agent_i.reset_agent()  # rest properties
@@ -214,44 +216,49 @@ class system_game:
         (2)out of budget
         (3)at the goal
         '''
-
+        list_to_remove=[]
         # check 2
         list_agents_id = self.current_state.budget_checking()
         if list_agents_id is not None:
             to_remove = self.id_to_agents(list_agents_id)
             for p in to_remove:
-                self.remove_agent(p)
-            print('out of budget!!')
-            return True,'budget'
+                list_to_remove.append(p)
+            #print('out of budget!!')
+            return True,'budget',0,list_to_remove,False
 
-        # check 1
-        agentz = self.current_state.collusion()
-        if agentz is not None:
-            print("agentz: ", agentz)
-            for collusion_i in agentz:
-                for agent_p in collusion_i:
-                    agent_obj = self.id_to_agents([agent_p['p']])[0]
-
-                    reward_func(self.agents_in,agentz,'collusion',self.current_state.coll_reward)
-
-                    self.remove_agent(agent_obj)
-            print ('collusion!!')
-            return True,'collusion'
 
         #check 3
         agentz  = self.current_state.check_gaol()
         if agentz is not None:
-            print('at the goal!!')
+            #print('at the goal!!')
             agents_objects = self.id_to_agents(agentz)
             reward_func(self.agents_in, agentz, 'goal',self.current_state.goal_reward)
-            for obj_player in agents_objects :
-                self.remove_agent(obj_player)
+            for obj_player in self.agents_in['A']:
+                list_to_remove.append(obj_player)
+            for obj_player in self.agents_in['B']:
+                obj_player.reward+=self.current_state.goal_reward
+                list_to_remove.append(obj_player)
 
-            self.remove_all_player()
 
-            return True,'goal'
+            return True,'goal',self.current_state.goal_reward,list_to_remove,True
 
-        return False,None
+
+        # check 1
+        agentz = self.current_state.collusion()
+        if agentz is not None:
+            #print("agentz: ", agentz)
+            for collusion_i in agentz:
+                for agent_p in collusion_i:
+                    agent_obj = self.id_to_agents([agent_p['p']])[0]
+                    agent_obj.reward+=self.current_state.coll_reward
+                    list_to_remove.append(agent_obj)
+
+            #print ('collusion!!')
+            return True,'collusion',self.current_state.coll_reward,list_to_remove,True
+
+
+
+        return False,None,0,list_to_remove,False
 
 
     def remove_all_player(self):
@@ -272,48 +279,63 @@ class system_game:
         print ('rollback')
         self.current_state.state_rollback_exclude_budget(self.previous_state)
 
+    def remove_players_list(self,l_to_remove):
+        for p in l_to_remove:
+            self.remove_agent(p)
 
-    def check_reward(self):
-        pass
+    def update_policy(self,player,s_old,r,a,s_new):
+        player.update(s_old,r,a,s_new,self.action_drive_object)
+
 
     def start_game(self,policy_eval):
 
         is_end = False
         info=None
         ctr_rounds=0
+
         while True:
+            sum_of_reward=0
             #print ('\n')
-            self.history.append(str(self.current_state))
+            #self.history.append(str(self.current_state))
             for symbol in self.agents_in:
-                self.print_state()
-                print(self.current_state)
+                #self.print_state()
+                #print(self.current_state)
                 if is_end:
                     break
                 for agent_i in self.agents_in[symbol]:
                     # deep copying the sate for rollback
                     self.previous_state = self.current_state.get_deep_copy_state()
 
-                    agent_i.play(self.current_state,policy_eval,self.action_drive_object)
-                    #valid move
-                    if self.check_valid_move() is False:
-                        reward_func(agent_i,None,'wall',self.current_state.wall_reward)
-                        self.rollback()
-                    self.check_reward()
-                    is_removed,info = self.check_conditions()
+                    a = agent_i.play(self.current_state,policy_eval,self.action_drive_object)
+
+                    is_removed,info,r,l_remove,fin_state = self.check_conditions()
+
+                    #self.update_policy(agent_i, self.previous_state, r, a, self.current_state)
+
                     if is_removed:
-                        if self.end_game():
-                            is_end=True
-                            self.history.append(str(self.current_state))
-                            print ("END STATE:\t",str(self.current_state))
-                            break
+                        for player_i in l_remove:
+                            if player_i.get_team()=='B':
+                                sum_of_reward+=player_i.reward
+                            self.remove_agent(player_i) # remove player
+
+
+                    # end loop
+                    if is_removed:
+                        #if self.end_game() :
+                        is_end=True
+                        #self.history.append(str(self.current_state))
+                        #print ("END STATE:\t",str(self.current_state))
+                        break
 
             ctr_rounds+=1
-            print ("round : {}".format(ctr_rounds))
+            #print ("round : {}".format(ctr_rounds))
             if is_end:
-                print ('---End Episode---')
+                #print ('---End Episode---')
                 break
 
-        return info,ctr_rounds
+
+
+        return info,ctr_rounds,sum_of_reward
 
     def start_episode(self):
         self.history=[]
@@ -325,38 +347,63 @@ class system_game:
                 p.reset_agent()
         self.set_starting_state()
 
-    def loop_game(self,num_of_epsidoe=1000010):
+    def loop_game(self,n,num_of_epsidoe=20000):
         d_list=[]
         for i in range(1,num_of_epsidoe):
-            if i%5000==0:
-                sum_col,sum_goal,avg_round = self.eval_policy(i)
-                d_list.append({'iter': i, 'sum_collusion':sum_col, 'sum_goal':sum_goal,'avg_round':avg_round})
+            if i%1000==0:
+                sum_col, sum_goal, avg_round, r = self.eval_policy()
+                d_list.append({'iter': i,'Avg Rerward':r ,'sum_collusion':sum_col, 'sum_goal':sum_goal,'avg_round':avg_round})
             self.start_episode()
-            info, ctr_rounds = self.start_game(policy_eval=False)
+            info, ctr_rounds,r = self.start_game(policy_eval=False)
             print ('num_of_epsidoe:\t',i)
         df_fin =pd.DataFrame(d_list)
-        df_fin.to_csv('{}/fin_{}.csv'.format('/home/ise/car_model',time.strftime("%m_%d_%H_%M_%S")), sep='\t')
+        df_fin.to_csv('{}/fi_n_{}_t_{}.csv'.format('/home/ise/car_model',n,time.strftime("%m_%d_%H_%M_%S")), sep='\t')
 
-    def eval_policy(self,iter_num,num_of_iteration=500):
-        d_l = []
+    def eval_policy(self, num_of_iteration=300):
+        d_l = {'collusion': 0, 'goal': 0, 'round': [], 'reward': []}
         for i in range(num_of_iteration):
             self.start_episode()
-            info, ctr_rounds = self.start_game(policy_eval=True)
-            d_l.append({'round': ctr_rounds, 'end': info, 'history': " / ".join(self.history)})
-        df = pd.DataFrame(d_l)
-        df['collusion'] = np.where(df['end'] == 'collusion', 1, 0)
-        df['goal'] = np.where(df['end'] == 'goal', 1, 0)
-        df['budget'] = np.where(df['end'] == 'budget', 1, 0)
-        df.to_csv('{}/i_{}_{}.csv'.format('/home/ise/car_model',iter_num,time.strftime("%m_%d_%H_%M_%S")), sep='\t')
-        return df['collusion'].sum(),df['goal'].sum(),df['round'].mean()
+            info, ctr_rounds, r = self.start_game(policy_eval=True)
+            d_l['round'].append(ctr_rounds)
+            d_l['reward'].append(r)
+            if info == 'collusion':
+                d_l['collusion'] += 1
+            else:
+                d_l['goal'] += 1
 
+        avg_reward = sum(d_l['reward']) / float(len(d_l['reward']))
+        avg_round = sum(d_l['round']) / float(len(d_l['round']))
+        return d_l['collusion'], d_l['goal'], avg_round, avg_reward
+
+
+def generator_game():
+    l=[(7,2),(8,2),(9,2),(9,2),(10,2),(11,2)]
+    for item in l:
+        str_i='-x {0} -y {0} -G 0,0:2,0 -A -n|1:-p|short:-b|52 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1)
+        print (str_i)
+        s = system_game()
+        s.init_game(str_i)
+        s.loop_game(item[0])
+
+        str_i='-x {0} -y {0} -G 0,0:2,0 -A -n|1:-p|short:-b|52 -B -n|1:-p|dog:-b|100 -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1)
+        print (str_i)
+        s = system_game()
+        s.init_game(str_i)
+        s.loop_game(item[0])
+
+
+import time
 if __name__ == "__main__":
+    generator_game()
+    exit()
 
-    std_in_string = '-x 9 -y 9 -G 0,0:2,0 -A -n|1:-p|short:-b|52 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 8,8'
+    #std_in_string = '-x 9 -y 9 -G 0,0:2,0 -A -n|1:-p|short:-b|52 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 8,8'
     #std_in_string = '-x 8 -y 8 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 7,7'
     #std_in_string = '-x 5 -y 5 -G 0,0:4,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,4'
     #std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 3,0 -A_s 3,3'
     #std_in_string = '-x 3 -y 3 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,2'
+    std_in_string = '-x 13 -y 13 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|dog:-b|100 -B_s 2,0 -A_s 12,12'
+
 
     s = system_game()
     s.init_game(std_in_string)

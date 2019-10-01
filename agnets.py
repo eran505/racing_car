@@ -3,6 +3,8 @@ from random import choice,randint
 from action import action_drive
 from graph_policy import short_path_policy
 from random_policy import rand_policy
+
+from dog_policy import dog
 class agent_player:
 
     def __init__(self,name,starting_budget,policy,team_symbol):
@@ -75,7 +77,8 @@ class agent_player:
             return True
         return False
 
-
+    def update(self,s_old,r,a,s_new,action_obj):
+        self.policy_object.update_policy(s_old,r,a,s_new,action_obj)
 
 
     def init_policy(self,pathz=None,policy_name=''):
@@ -83,14 +86,16 @@ class agent_player:
             self.policy_object = rand_policy()
         if policy_name == 'short':
             self.policy_object = short_path_policy(pathz)
-
+        if policy_name == 'dog':
+            self.policy_object = dog()
 
     def play(self,state,policy_eval,action_obj):
         self.ctr_move+=1
         speed_addition = self.policy_object.get_action(state,self.name_id,policy_eval,action_obj)
         action_obj.setter(speed_addition ,state)
-        action_obj.execute_action(self.name_id)
-        return
+        r = action_obj.execute_action(self.name_id)
+        self.reward+=r
+        return speed_addition
 
     def random_policy(self):
         x_axis = randint(-1, 1)

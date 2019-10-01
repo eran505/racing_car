@@ -1,15 +1,17 @@
 from graph_policy import short_path_policy
 from random import choices,choice
+import copy
 class action_drive:
 
     def __init__(self,speed,state):
         self.speed_to_add=speed
         self.cur_state = state
-        self.step_cost=0
+        self.step_cost=0.01
         self.cost=0.5
         self.absolute_max_speed=2
         self.action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
         self.tran={}
+        self.wall=None
 
     def set_tran(self,id_p,tran):
         self.tran[id_p]=tran
@@ -23,8 +25,8 @@ class action_drive:
 
     def execute_action(self,id_p):
         self.stochastic_action(id_p)
-        self.apply_action(id_p)
-
+        r = self.apply_action(id_p)
+        return r
     def stochastic_action(self,player_id):
         if str(player_id).__contains__('B'):
             d={}
@@ -43,12 +45,32 @@ class action_drive:
         pass
 
     def apply_action(self,agent_id):
+        r=0
         new_speed = self.change_speed(agent_id)
         pos_cur = self.cur_state.get_agent_position(agent_id)
+        old_pos = copy.deepcopy(pos_cur)
         new_pos = [pos_cur[i] + new_speed[i] for i in range(len(new_speed))]
-        self.cur_state.set_agent_position(agent_id,new_pos)
         budget_cur = self.cur_state.get_agent_budget(agent_id)
         self.cur_state.set_agent_budget(agent_id,budget_cur - self.cost)
+
+        if self.out_of_bound(new_pos):
+            self.cur_state.set_agent_position(agent_id, old_pos)
+            self.cur_state.set_agent_speed(agent_id, (0,0))
+            self.wall = True
+            r+=self.cur_state.wall_reward
+        else:
+            self.cur_state.set_agent_position(agent_id,new_pos)
+            self.wall=False
+
+        r+=self.step_cost
+
+        return r
+
+    def out_of_bound(self,new_pos):
+        if self.cur_state.grid.is_vaild_move(new_pos[0],new_pos[1]):
+            return False
+        return True
+
 
     def change_speed(self,agent_id):
         old_speed = self.cur_state.get_agent_speed(agent_id)
@@ -70,37 +92,74 @@ class action_drive:
     def get_max_action(self):
         pass
 
-    def get_expected_reward(self,player_id):
+    def expected_return_reward(self,state):
+        self.cur_state=state
+        state_next_states = self.all_tran_function()
+        return state_next_states
+
+    def get_next_state(self,player_id,action_set):
         s_state = self.cur_state.get_deep_copy_state()
-        #action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
-        d_action={}
-        d_wall={}
-        state_reward={}
-        for action_a in self.action_list:
+        d_all={}
+        for action_a in action_set:
             self.speed_to_add=action_a
             self.cur_state = s_state.get_deep_copy_state()
             self.apply_action(player_id)
             r = self.step_cost
             r += self.cur_state.get_reward_by_state()
             if r == self.step_cost:
+                if self.wall is True:
+                    r += self.cur_state.wall_reward
                 self.tran_function()
-                r = self.cur_state.get_reward_by_state()
-            bol_wall =self.cur_state.is_wall_all()
-            if bol_wall is True:
-                r+=self.cur_state.wall_reward
+                r += self.cur_state.get_reward_by_state()
+                r += self.step_cost
             str_state=self.cur_state.state_to_string_no_budget()
-            d_action[action_a]=str_state
-            state_reward[str_state]=r
-            d_wall[str_state] = bol_wall
+            d_all[action_a]=(str_state,r)
 
-        return state_reward,d_action,d_wall
+        return d_all
 
 
-    def tran_function(self,id_roll='A1'):
-        a = short_path_policy.policy_next_step_shortest_path\
-            (self.tran[id_roll],self.cur_state.get_agent_position(id_roll),self.cur_state.get_agent_speed(id_roll))
-        self.speed_to_add=a
+    def get_expected_reward(self,player_id):
+        s_state = self.cur_state.get_deep_copy_state()
+        #action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
+        d_all={}
+        for action_a in self.action_list:
+            self.speed_to_add=action_a
+            self.cur_state = s_state.get_deep_copy_state()
+            self.apply_action(player_id)
+            r = self.step_cost
+            reward = self.cur_state.get_reward_by_state()
+            if reward == 0:
+                if self.wall is True:
+                    r += self.cur_state.wall_reward
+                l_str_states = self.tran_function()
+                #r += self.step_cost
+                d_all[action_a] = (l_str_states, float(r))
+            else:
+                str_state=self.cur_state.state_to_string_no_budget()
+                d_all[action_a]=([(str_state,1.0)],float(r))
+        return d_all
+
+
+    def tran_function(self,id_roll='A1',expected=False):
+        list_a = short_path_policy.get_expected_action(self.cur_state,id_roll,self.tran[id_roll])
+        list_state = []
+        state_old = self.cur_state.get_deep_copy_state()
+        for item in list_a:
+            a = item[0]
+            self.cur_state = state_old.get_deep_copy_state()
+            self.speed_to_add=a
+            self.apply_action(id_roll)
+            str_state = self.cur_state.state_to_string_no_budget()
+            list_state.append( (str_state, item[1]) )
+        return list_state
+
+    def all_tran_function(self,id_roll='A1'):
+        a = short_path_policy.policy_next_step_shortest_path \
+            (self.tran[id_roll], self.cur_state.get_agent_position(id_roll), self.cur_state.get_agent_speed(id_roll))
+        self.speed_to_add = a
         self.apply_action(id_roll)
+        return [(1.0,self.cur_state.state_to_string_no_budget())]
+
 
     @staticmethod
     def keywithmaxval(d):
@@ -117,7 +176,6 @@ class action_drive:
                 v_max=v[i]
             elif v_max==v[i]:
                 l.append(k[i])
-        print(l)
         res = choice(l)
         return res
 

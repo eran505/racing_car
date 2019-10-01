@@ -2,6 +2,8 @@
 import random
 import networkx as nx
 
+from numpy import round
+
 def shortest_path(G,strat_point,end_point):
     paths = nx.all_shortest_paths(G,source=strat_point,target=end_point)
     all_paths =[]
@@ -90,16 +92,50 @@ class short_path_policy:
         self.name_policy='shortest path'
         self.policy_path=None
         self.starting_p = None
+        self.d_policy=None
+        self.uniform_policy()
+
+    def uniform_policy(self):
+        self.d_policy={}
+        for ky_start in self.optional_pathz:
+            for ky_goal in self.optional_pathz[ky_start]:
+                for path_i in self.optional_pathz[ky_start][ky_goal]:
+                    for i in range(len(path_i)-1):
+                        if path_i[i] not in self.d_policy:
+                            self.d_policy[path_i[i]]=[]
+                        self.d_policy[path_i[i]].append(path_i[i+1])
+
+        self.probabily_entries()
+        print ()
+
+    def probabily_entries(self):
+        for ky in self.d_policy:
+            l_action = self.d_policy[ky]
+            prob = counter_method(l_action)
+            self.d_policy[ky]=prob
+
+
 
     def rest(self,dict_info):
-        self.starting_p = dict_info['start']
-        self.choose_policy_path()
+        pass
+
+    def update_policy(self,s_old,r,a,s_new,action_obj):
+        pass
+
+    def update_end(self,state,reward):
+        pass
 
     def get_action(self,state,id_agnet,action_obj,policy_eval):
-        cur_pos = state.get_agent_position(id_agnet)
-        speed_cur = state.get_agent_speed(id_agnet)
-        return short_path_policy.policy_next_step_shortest_path\
-            (self.policy_path,cur_pos,speed_cur)
+        cur_pos = tuple(state.get_agent_position(id_agnet))
+        speed_cur = tuple(state.get_agent_speed(id_agnet))
+        l_option = short_path_policy.optional_next_action(self.d_policy,cur_pos,speed_cur)
+        prob=[]
+        item_action=[]
+        for item in l_option:
+            prob.append(item[1])
+            item_action.append(item[0])
+        a = random.choices(population=item_action,weights=prob)
+        return a[0]
 
     def choose_policy_path(self):
         '''
@@ -116,7 +152,31 @@ class short_path_policy:
         self.policy_path=choosen
 
     def get_tran(self):
-        return self.policy_path
+        return self.d_policy
+
+    @staticmethod
+    def get_expected_action(state,id_agnet,policy):
+        cur_pos = tuple(state.get_agent_position(id_agnet))
+        speed_cur = state.get_agent_speed(id_agnet)
+        return short_path_policy.optional_next_action(policy,cur_pos,speed_cur)
+
+    @staticmethod
+    def optional_next_action(policy,cur_pos,cur_speed):
+        l_next_move = policy[cur_pos]
+        optional_moves_action = []
+        for next_move in l_next_move:
+            tup_res = short_path_policy.diff_tuple(cur_pos, next_move[0])
+            diff_speed = short_path_policy.diff_tuple(cur_speed, tup_res)
+            if short_path_policy.if_binary_speed(diff_speed):
+                optional_moves_action.append((tuple(diff_speed),next_move[1]))
+        return optional_moves_action
+
+    @staticmethod
+    def if_binary_speed(speed):
+        for i in range(len(speed)):
+            if speed[i]>1 or speed[i]<-1:
+                return False
+        return True
 
     @staticmethod
     def policy_next_step_shortest_path(path,cur_pos,speed):
@@ -151,18 +211,14 @@ class short_path_policy:
         return t3
 
 
+from collections import Counter
 
 
+
+def counter_method(l):
+    size = float(len(l))
+    res = Counter(l)
+    return [(k,v/size) for k,v in res.items()]
 
 if __name__ == "__main__":
-    path = [(0, 0), (1, 1), (1, 2), (2, 3), (3, 4), (4, 5)]
-    cur= (4, 5)
-    speed = (1,0)
-    while cur != [0,0]:
-        a = policy_next_step_shortest_path(path,cur,speed)
-        print ('action: {}'.format(a))
-        speed = diff_tuple(speed,a,False)
-        new_cur = (diff_tuple(cur,speed,False))
-        print ("new_cur: {}".format(new_cur))
-        cur = new_cur
-    print('policy_script')
+    print ("-----MY--------")

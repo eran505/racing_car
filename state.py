@@ -12,9 +12,9 @@ class game_state:
         self.team_dict={'A':-1,'B':1}
         self.dead_state=('na','na')
         self.grid=gird
-        self.goal_reward=  -10
-        self.coll_reward=   10
-        self.wall_reward=   -1
+        self.goal_reward=  -10.0
+        self.coll_reward=   10.0
+        self.wall_reward=   -1.0
 
     @staticmethod
     def string_to_state(string_str,grid,split='|'):
@@ -144,6 +144,8 @@ class game_state:
             return True
         else:
             return False
+
+
 
     def is_wall_all(self):
         for ky in self.player_position:
