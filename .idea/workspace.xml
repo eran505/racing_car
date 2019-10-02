@@ -4,14 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/value_iteration.py" line="146" mnemonic="0" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a2cf9e7-5059-4257-9acf-3792622dfcbc" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/agnets.py" beforeDir="false" afterPath="$PROJECT_DIR$/agnets.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rtdp_algo.py" beforeDir="false" afterPath="$PROJECT_DIR$/rtdp_algo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/system.py" beforeDir="false" afterPath="$PROJECT_DIR$/system.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util_system.py" beforeDir="false" afterPath="$PROJECT_DIR$/util_system.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/value_iteration.py" beforeDir="false" afterPath="$PROJECT_DIR$/value_iteration.py" afterDir="false" />
-    </list>
+    <list default="true" id="7a2cf9e7-5059-4257-9acf-3792622dfcbc" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
