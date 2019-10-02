@@ -347,7 +347,7 @@ class system_game:
                 p.reset_agent()
         self.set_starting_state()
 
-    def loop_game(self,n,num_of_epsidoe=20000):
+    def loop_game(self,n,num_of_epsidoe=5000):
         d_list=[]
         for i in range(1,num_of_epsidoe):
             if i%1000==0:
@@ -377,13 +377,13 @@ class system_game:
 
 
 def generator_game():
-    l=[(7,2),(8,2),(9,2),(9,2),(10,2),(11,2)]
+    l=[(7,20000),(8,25000),(9,30000),(10,40000),(11,50000),(12,60000),(13,70000)]
     for item in l:
         str_i='-x {0} -y {0} -G 0,0:2,0 -A -n|1:-p|short:-b|52 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1)
         print (str_i)
         s = system_game()
         s.init_game(str_i)
-        s.loop_game(item[0])
+        s.loop_game(item[0],item[1])
 
         str_i='-x {0} -y {0} -G 0,0:2,0 -A -n|1:-p|short:-b|52 -B -n|1:-p|dog:-b|100 -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1)
         print (str_i)
@@ -405,8 +405,8 @@ if __name__ == "__main__":
     #std_in_string = '-x 13 -y 13 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|dog:-b|100 -B_s 2,0 -A_s 12,12'
 
 
-    s = system_game()
-    s.init_game(std_in_string)
-    s.loop_game()
+    #s = system_game()
+    #s.init_game(std_in_string)
+    #s.loop_game()
 
     #print ("system class")
