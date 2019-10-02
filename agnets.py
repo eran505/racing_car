@@ -39,10 +39,13 @@ class agent_player:
     def get_team(self):
         return "{}".format(self.name_id[:-1])
 
-    def reset_agent(self):
+    def reset_agent(self,info=None):
         self.choose_start_state()
         self.budget = int(self.start_budget)
-        self.policy_object.rest({'start':self.starting_point})
+        if self.policy_name=='value':
+            self.policy_object.rest(info)
+        else:
+            self.policy_object.rest({'start': self.starting_point})
         self.reward=0
         self.ctr_move=0
 

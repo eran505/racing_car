@@ -1,9 +1,9 @@
 import numpy as np
 from itertools import product
 from itertools import product
-
+from graph_policy import short_path_policy
 from planner import construct_map_state
-
+import util_system
 import state
 from action import action_drive
 class value_iteration_object:
@@ -18,10 +18,19 @@ class value_iteration_object:
         self.players= ['B1','A1']
         self.transition_prob=0.9
         self.action_wind = (0,0)
-        self.discount_factor=float(0.6)
+        self.discount_factor=float(0.8)
         self.epsilon = 0.0001
+        self.update_state=[]
+        self.is_update=True
+        self.op_policy=None
+        self.transaction_action=None
+        self.sum_tran_p=None
 
 
+    def constractor(self):
+        self.transaction_action=np.zeros(len(self.action_map))
+        self.transaction_action[self.action_map[(0,0)]]=0.1
+        self.sum_tran_p = np.sum(self.transaction_action)
 
     def get_action(self,state,id_agent,policy_eval):
         a = self.greedy_action(state,id_agent)
@@ -41,7 +50,24 @@ class value_iteration_object:
             d[action_i]=v_i
         return action_drive.keywithmaxval(d)
 
-    def rest(self,dict_info=None):
+    def rest(self,action=None):
+        if self.is_update:
+            self.op_policy=action.tran['A1']
+            self.loop_update()
+        self.is_update=False
+
+    def expected_value_op(self,l_action,str_state):
+        v_vector = np.zeros((len(l_action)))
+        p_vector = np.zeros((len(l_action)))
+        ctr=0
+        for a in l_action:
+            s_i = util_system.string_change_by_action_id(a[0], 'A1', str_state)
+            v = self.matrix_v[self.map_state[s_i]]
+            v_vector[ctr]=v*self.discount_factor
+            p_vector[ctr]=a[1]
+            ctr+=1
+        return np.dot(v_vector,p_vector)
+    def get_tran(self):
         pass
 
     def update_table(self):
@@ -52,64 +78,58 @@ class value_iteration_object:
         '''
         i=0
         print ("update_table....")
-        action_a = action_drive(None,None)
-        acc_diff=0
-        size_states = len(self.map_state)
-        for ky in self.map_state:
+        error=0
+        for ky in self.update_state:
             #print (i)
             i += 1
             entry = self.map_state[ky]
             v = self.matrix_v[entry]
+            d_action={}
 
-            # if we in the absorbed state
-            if ky in self.state_absorbed_map['goal']:
-                self.matrix_v[entry]=self.start_state.goal_reward
-                continue
-            if ky in self.state_absorbed_map['collusion']:
-                self.matrix_v[entry] = self.start_state.coll_reward
-                continue
+            vector = np.zeros((len(self.action_map)))
+            for action_i in self.action_map:
+                d_help={}
+                action_entry_i = self.action_map[action_i]
+                d_action[action_i]=[]
+                state_next = util_system.string_change_by_action_id(action_i,'B1',ky)
+                if state_next not in self.map_state:
+                    r=self.start_state.wall_reward
+                    state_next=util_system.string_change_by_zero_speed('B1',ky)
+                if state_next not in d_help:
+                    op_pos,op_speed= util_system.get_spped_pos(state_next,'A1')
+                    l_action = short_path_policy.optional_next_action(self.op_policy, op_pos, op_speed)
+                    v_expected = self.expected_value_op(l_action ,state_next)
+                    v_expected += r
+                    d_help[state_next] = v_expected
+                else:
+                    v_expected = d_help[state_next]
 
-            state_v = state.game_state.string_to_state(ky,self.start_state.grid)
-            action_a.set_state(state_v)
-            d_state,d_action,d_wall = action_a.get_expected_reward('B1')
-            d_value={}
-            d_action_vale={}
-            for ky_i in d_state:
-                if d_wall[ky_i]:
-                    d_value[ky_i]=self.start_state.wall_reward
-                    continue
-                entry_i = self.map_state[ky_i]
-                d_value[ky_i]=self.matrix_v[entry_i] * self.discount_factor
+                vector[action_entry_i] = v_expected
+            d_expected_value={}
 
-            state_fail_exe = d_action[self.action_wind]
-            state_fail_exe_r = d_state[state_fail_exe]
-            v_fail = d_value[state_fail_exe]
-            reward_fail = v_fail+state_fail_exe_r
+            for ky in d_action:
+                action_entry = self.action_map[ky]
+                self.transaction_action[action_entry] += (1.0 - self.sum_tran_p)
 
-            for a in d_action:
-                str_s = d_action[a]
-                a_reward = d_state[str_s] + d_value[str_s]
-                expected_reward = a_reward*self.transition_prob+(1.0-self.transition_prob)*reward_fail
-                d_action_vale[a]=expected_reward
+                d_expected_value[ky] = np.round(np.dot(vector, self.transaction_action), 6)
 
-            a_max = action_drive.keywithmaxval(d_action_vale)
-            acc_diff += abs(v - d_action_vale[a_max])
-            self.matrix_v[entry] = d_action_vale[a_max]
+                self.transaction_action[action_entry] -= (1.0 - self.sum_tran_p)
 
-        if acc_diff <= self.epsilon * size_states:
-            return False
-        return True
-
-
+            max_value = util_system.get_max_value_dict(d_expected_value)
+            error +=abs(v-max_value)
+            #print("error\t",)
+            self.matrix_v[entry]=max_value
+        return error
 
     def loop_update(self,max_update = 100):
         ctr=0
-        for i in range(max_update):
-            bol = self.update_table()
+        for i in range(100):
+            error = self.update_table()
             print(ctr)
-            ctr+=1
-            if bol is False:
+            print(error)
+            if error < 1:
                 break
+            ctr+=1
         print ("done")
 
 
@@ -118,25 +138,31 @@ class value_iteration_object:
     def init_matrix(self,x,y,num_agents,action_size=9,speed_state=25,dead_state=1,max_b=30):
             state_size_overall = pow(((x*y)+dead_state)*speed_state*max_b,num_agents)
             self.matrix_v = np.zeros(state_size_overall)
-            self.action_map = {'(0,0)': 0, '(0,1)': 1, '(0,-1)': 2, '(1,0)': 3
-                , '(1,1)': 4, '(1,-1)': 5, '(-1,0)': 6, '(-1,1)': 7, '(-1,-1)': 8}
-
-
+            self.action_map = \
+                {(0, 0): 0, (0, 1): 1, (0, -1): 2, (1, 0): 3
+                    , (1, 1): 4, (1, -1): 5, (-1, 0): 6, (-1, 1): 7, (-1, -1): 8}
+            self.constractor()
     def init_dict_state(self,x,y,max_speed=2,num_players=2):
         self.init_matrix(x,y,num_players)
         self.map_state= construct_map_state(x,y,max_speed,num_players,self.players)
         self.state_absorbed()
 
     def state_absorbed(self):
-        d_goal={}
-        d_coll={}
+        d_all={}
         for state_i in self.map_state:
             obj_state = state.game_state.string_to_state(state_i,self.start_state.grid)
             if obj_state.check_gaol() is not None:
-                d_goal[state_i]=True
+                entry = self.map_state[state_i]
+                self.matrix_v[entry]=obj_state.goal_reward
+                d_all[entry]=True
             elif obj_state.collusion() is not None:
-                d_coll[state_i] = True
-        self.state_absorbed_map={'goal':d_goal,'collusion':d_coll}
+                entry = self.map_state[state_i]
+                self.matrix_v[entry]=obj_state.coll_reward
+                d_all[entry] = True
+            else:
+                self.update_state.append(state_i)
+
+        self.state_absorbed_map=d_all
 
 if __name__ == "__main__":
     pass

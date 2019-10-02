@@ -30,6 +30,9 @@ class rtdp:
         self.tmp_d = None
         self.default_actions=[]
         self.init_action_map()
+
+
+
     def init_action_map(self):
         self.action_map =\
             {(0,0): 0, (0,1): 1, (0,-1): 2, (1,0): 3

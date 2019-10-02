@@ -18,7 +18,7 @@ class system_game:
         self.grid_bord=None
         self.agents_list=None
         self.agents={}
-        self.action_drive_object=None
+        self.action_drive_object=action_drive(None,None)
         self.history=[]
         self.agents_out={}
         self.agents_in={}
@@ -28,7 +28,6 @@ class system_game:
 
 
     def set_starting_state(self):
-        self.action_drive_object=action_drive(None,None)
         state_s = game_state()
         for symbol_team in self.agents_in:
             for agnet_i in self.agents_in[symbol_team]:
@@ -36,7 +35,7 @@ class system_game:
                 state_s.set_agent_position(id_agent ,agnet_i.starting_point)
                 state_s.set_agent_speed(id_agent,(0,0))
                 state_s.set_agent_budget(id_agent,agnet_i.budget)
-                self.action_drive_object.set_tran(id_agent,agnet_i.policy_object.get_tran())
+                #self.action_drive_object.set_tran(id_agent,agnet_i.policy_object.get_tran())
         #print (state_s)
         self.current_state = state_s
         self.current_state.grid=self.grid_bord
@@ -121,8 +120,7 @@ class system_game:
         print ("update_value:\t{}".format(update_num))
         v = value_iteration.value_iteration_object(self.grid_bord)
         v.init_dict_state(self.grid_bord.x_size,self.grid_bord.y_size)
-        v.loop_update(update_num)
-        agent.policy_object=v
+        agent.policy_object = v
 
     def set_policies(self):
         for stymbol in self.agents:
@@ -137,7 +135,12 @@ class system_game:
                     agent_i.init_policy(None,'dog')
                 elif agent_i.policy_name == 'rtdp':
                     self.set_rtdp(agent_i)
-                agent_i.reset_agent()  # rest properties
+
+                self.action_drive_object.set_tran(agent_i.get_id(), agent_i.policy_object.get_tran())
+
+        for stymbol in self.agents:
+            for agent_i in self.agents[stymbol]:
+                agent_i.reset_agent(self.action_drive_object)  # rest properties
 
     def id_to_agents(self,list_id):
         agentz=[]
@@ -377,7 +380,7 @@ class system_game:
 
 
 def generator_game():
-    l=[(7,20000),(8,25000),(9,30000),(10,40000),(11,50000),(12,60000),(13,70000)]
+    l=[(12,100000),(13,100000),(14, 100000),(15,100000),(16,100000),(17,100000)]
     for item in l:
         str_i='-x {0} -y {0} -G 0,0:2,0 -A -n|1:-p|short:-b|52 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1)
         print (str_i)
@@ -401,7 +404,7 @@ if __name__ == "__main__":
     #std_in_string = '-x 8 -y 8 -G 0,0:2,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 1,0 -A_s 7,7'
     #std_in_string = '-x 5 -y 5 -G 0,0:4,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,4'
     #std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 3,0 -A_s 3,3'
-    #std_in_string = '-x 3 -y 3 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 2,0 -A_s 2,2'
+    std_in_string = '-x 3 -y 3 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|value:-b|100 -B_s 2,0 -A_s 2,2'
     #std_in_string = '-x 13 -y 13 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|dog:-b|100 -B_s 2,0 -A_s 12,12'
 
 
@@ -409,4 +412,4 @@ if __name__ == "__main__":
     #s.init_game(std_in_string)
     #s.loop_game()
 
-    #print ("system class")
+    print ("system class")

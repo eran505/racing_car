@@ -1,5 +1,7 @@
 
 
+from ast import literal_eval
+
 
 def stdin_str_to_dict(str_in,splitby=' '):
     d={}
@@ -38,6 +40,47 @@ def make_speed_binary(tuple):
     return res
 
 
+def string_change_by_zero_speed(id_player,str_state):
+    players = str(str_state).split('|')
+    new_state = []
+    for p in players:
+        arr_info = str(p).split('_')
+        if id_player == arr_info[0]:
+            speed = '(0, 0)'
+            pos = arr_info[1]
+            new_state.append("{}_{}_{}_{}".format(id_player, pos, speed,arr_info[-1]))
+        else:
+            new_state.append(p)
+    return '|'.join(new_state)
+
+
+def get_spped_pos(str_state,id_player ):
+    players = str(str_state).split('|')
+    for p in players:
+        arr_info = str(p).split('_')
+        if id_player == arr_info[0]:
+            speed = literal_eval(arr_info[-2])
+            pos = literal_eval(arr_info[1])
+            return pos,speed
+    return None,None
+
+def string_change_by_action_id(action_a,id_player,str_state,max_speed=2):
+    players = str(str_state).split('|')
+    new_state=[]
+    for p in players:
+        arr_info = str(p).split('_')
+        if id_player == arr_info[0]:
+            speed = literal_eval(arr_info[-2])
+            pos = literal_eval(arr_info[1])
+            new_speed = [speed[i] + action_a[i] for i in range(len(speed))]
+            new_speed = make_max_speed(new_speed,max_speed)
+            # x if x % 2 else x * 100 for x in range(1, 10)
+            new_pos = [new_speed[i] + pos[i] for i in range(len(new_speed))]
+            new_state.append("{}_{}_{}_{}".format(id_player,tuple(new_pos),tuple(new_speed),arr_info[-1]))
+        else:
+            new_state.append(p)
+    return '|'.join(new_state)
+
 
 def diff_tuple(small_t, big_t, minus=True):
     if minus:
@@ -49,7 +92,30 @@ def diff_tuple(small_t, big_t, minus=True):
 def getAvg(x, n, sum):
     sum = sum + x;
     return float(sum) / n;
+
+def make_max_speed(speed,max):
+    new_speed=[]
+    for i in range(len(speed)):
+        if speed[i] > max:
+            new_speed.append(max)
+        elif speed[i] < -max:
+            new_speed.append(-max)
+        else:
+            new_speed.append(speed[i])
+    return tuple(new_speed)
+
+
+def get_max_value_dict(d):
+    max = -100
+    for v in d.values():
+        if v>max:
+            max=v
+    return max
+
+
+
 import time
+
 if __name__ == "__main__":
     print ('--util--')
     x=1000000
