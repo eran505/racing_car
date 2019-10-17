@@ -402,12 +402,16 @@ def generator_game():
     l=[(4,4001),(5,5001),(6,6001),(7,7001),(8,8001),(9,9001),(10,100001),(11,100001),(12,100001),(13,100001),(14,100001)
         , (15, 100001),(16,100001),(17,100001),(18,100001),(19,100001),(20,100001),(21,100001),(22,100001)]
     for item in l:
-        speed_A=2
+        speed_A=1
         speed_B=1
         goal_one,goal_two = np.random.choice(item[0],2,False)
         if item[0]>10:
             speed_A+=1
             speed_B+=1
+        if item[0]>19:
+            speed_A+=1
+            speed_B+=1
+            
         str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|rtdp:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
 
