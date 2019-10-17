@@ -6,12 +6,21 @@ class action_drive:
     def __init__(self,speed,state):
         self.speed_to_add=speed
         self.cur_state = state
-        self.step_cost=0.01
-        self.cost=0.5
-        self.absolute_max_speed=2
+        self.step_cost=-0
+        self.cost=0
         self.action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
         self.tran={}
+        self.max_abs_speed={}
+        self.d_max_speed={}
+        self.wall_is_end=True
         self.wall=None
+
+    def set_max_speed(self,id_p,speed):
+        self.d_max_speed[id_p]=speed
+
+    def set_max_abs_speed(self,id_p,speed_max):
+        self.max_abs_speed[id_p]=speed_max
+
 
     def set_tran(self,id_p,tran):
         self.tran[id_p]=tran
@@ -27,6 +36,8 @@ class action_drive:
         self.stochastic_action(id_p)
         r = self.apply_action(id_p)
         return r
+
+
     def stochastic_action(self,player_id):
         if str(player_id).__contains__('B'):
             d={}
@@ -54,10 +65,13 @@ class action_drive:
         self.cur_state.set_agent_budget(agent_id,budget_cur - self.cost)
 
         if self.out_of_bound(new_pos):
-            self.cur_state.set_agent_position(agent_id, old_pos)
-            self.cur_state.set_agent_speed(agent_id, (0,0))
+            r += self.cur_state.wall_reward
             self.wall = True
-            r+=self.cur_state.wall_reward
+            if self.wall_is_end is False:
+                self.cur_state.set_agent_position(agent_id, old_pos)
+                self.cur_state.set_agent_speed(agent_id, (0,0))
+            else:
+                self.cur_state.dead_player_position(agent_id)
         else:
             self.cur_state.set_agent_position(agent_id,new_pos)
             self.wall=False
@@ -76,17 +90,18 @@ class action_drive:
         old_speed = self.cur_state.get_agent_speed(agent_id)
         new_speed = [self.speed_to_add[i] + old_speed[i] for i in range(len(old_speed))]
         self.cur_state.set_agent_speed(agent_id,new_speed)
-        new_speed = self.check_limit_speed(new_speed)
+        new_speed = self.check_limit_speed(agent_id,new_speed)
         return new_speed
 
-    def check_limit_speed(self,speed):
+    def check_limit_speed(self,agent_id,speed):
         for i in range(len(speed)):
-            if abs(speed[i]) > self.absolute_max_speed:
+            if abs(speed[i]) > self.d_max_speed[agent_id]:
                 if speed[i]>0:
-                    speed[i]=self.absolute_max_speed
+                    speed[i]=self.d_max_speed[agent_id]
                 else:
-                    speed[i] = self.absolute_max_speed*(-1)
+                    speed[i] = self.d_max_speed[agent_id]*(-1)
         return speed
+
 
 
     def get_max_action(self):
@@ -123,34 +138,42 @@ class action_drive:
         #action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
         d_all={}
         for action_a in self.action_list:
+            is_wall_state=False
             self.speed_to_add=action_a
             self.cur_state = s_state.get_deep_copy_state()
             self.apply_action(player_id)
             r = self.step_cost
             reward = self.cur_state.get_reward_by_state()
+
             if reward == 0:
                 if self.wall is True:
+                    is_wall_state=True
                     r += self.cur_state.wall_reward
+                    if self.wall_is_end:
+                        str_state = self.cur_state.state_to_string_no_budget()
+                        d_all[action_a] = ([(str_state, float(r), 1.0)], float(r), is_wall_state)
+                        continue
                 l_str_states = self.tran_function()
                 #r += self.step_cost
-                d_all[action_a] = (l_str_states, float(r))
+                d_all[action_a] = (l_str_states, float(r),is_wall_state)
             else:
                 str_state=self.cur_state.state_to_string_no_budget()
-                d_all[action_a]=([(str_state,1.0)],float(r))
+                d_all[action_a]=([(str_state,float(r),1.0)],float(r),is_wall_state)
         return d_all
 
 
     def tran_function(self,id_roll='A1',expected=False):
-        list_a = short_path_policy.get_expected_action(self.cur_state,id_roll,self.tran[id_roll])
+        list_a = self.tran[id_roll].get_transition(self.cur_state,id_roll)
         list_state = []
         state_old = self.cur_state.get_deep_copy_state()
         for item in list_a:
-            a = item[0]
+            a = item[-2]
             self.cur_state = state_old.get_deep_copy_state()
             self.speed_to_add=a
             self.apply_action(id_roll)
+            reward_r = self.cur_state.get_reward_by_state()
             str_state = self.cur_state.state_to_string_no_budget()
-            list_state.append( (str_state, item[1]) )
+            list_state.append( (str_state,reward_r,item[-1]) )
         return list_state
 
     def all_tran_function(self,id_roll='A1'):

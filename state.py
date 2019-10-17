@@ -31,6 +31,17 @@ class game_state:
     def dead_player_position(self,agent_id):
         self.player_position[agent_id]=self.dead_state
         self.speed[agent_id]=(0,0)
+        self.player_budget[agent_id] = 0.0
+
+
+    def is_wall_state(self):
+        l_wall=[]
+        for ky in self.player_position:
+            if self.player_position[ky] == self.dead_state:
+                l_wall.append(ky)
+        if len(l_wall) == 0:
+            return None
+        return l_wall
 
 
     def get_agent_speed(self,agent_id):

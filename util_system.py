@@ -112,11 +112,23 @@ def get_max_value_dict(d):
             max=v
     return max
 
+def is_valid_path(path_s):
+    speed = [0, 0]
+    for i in range(len(path_s) - 1):
+        diff = diff_tuple(path_s[i], path_s[i + 1])
+        for item in diff:
+            if abs(item) > 1:
+                print(path_s, '\t', 'Not valid path')
+                exit()
 
+        new_speed = diff_tuple(speed, diff, minus=False)
+        speed = new_speed
+    print ('OK')
 
 import time
 
 if __name__ == "__main__":
+
     print ('--util--')
     x=1000000
     arr= range(0, x)

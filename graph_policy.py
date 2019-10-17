@@ -1,7 +1,7 @@
 
 import random
 import networkx as nx
-
+import util_system as util
 from numpy import round
 
 def shortest_path(G,strat_point,end_point):
@@ -49,7 +49,7 @@ def add_diagonal_edges(graph_g,x,y):
         if x_i-1 >= 0 and y_i + 1 < y:
             graph_g.add_edge((x_i, y_i), (x_i -1, y_i + 1))
 
-def grid_to_graph(gird,is_diagonal=False):
+def grid_to_graph(gird,is_diagonal=True):
     x=gird.x_size
     y=gird.y_size
     G = nx.grid_2d_graph(x,y)
@@ -87,26 +87,30 @@ class dog:
 
 class short_path_policy:
 
-    def __init__(self,paths):
+    def __init__(self,paths,absolut_max_speed):
         self.optional_pathz = paths
         self.name_policy='shortest path'
         self.policy_path=None
         self.starting_p = None
         self.d_policy=None
+        self.max_look_head=2
+        self.max_speed=absolut_max_speed
+        self.d_pos_t_step=None
+        self.action_set={}
+        self.pos_goal=set()
+        self.action_list_a=None
+        self.pre_function()
         self.uniform_policy()
 
-    def uniform_policy(self):
-        self.d_policy={}
-        for ky_start in self.optional_pathz:
-            for ky_goal in self.optional_pathz[ky_start]:
-                for path_i in self.optional_pathz[ky_start][ky_goal]:
-                    for i in range(len(path_i)-1):
-                        if path_i[i] not in self.d_policy:
-                            self.d_policy[path_i[i]]=[]
-                        self.d_policy[path_i[i]].append(path_i[i+1])
+    def pre_function(self):
+        self.action_list_a = [(0, 0), (0, 1), (0, -1), (1, 0), (1, 1), (1, -1), (-1, 0), (-1, 1), (-1, -1)]
 
-        self.probabily_entries()
-        print ()
+
+
+
+    def uniform_policy(self):
+        self.rearrange_data()
+
 
     def probabily_entries(self):
         for ky in self.d_policy:
@@ -126,16 +130,86 @@ class short_path_policy:
         pass
 
     def get_action(self,state,id_agnet,action_obj,policy_eval):
+        '''
+        [pos, speed, action, uni_probability]
+        '''
+        res = self.get_transition(state,id_agnet)
+        ch = random.randrange(0, len(res), 1)
+        return res[ch][-2]
+
+    def get_transition(self,state,id_agnet):
         cur_pos = tuple(state.get_agent_position(id_agnet))
         speed_cur = tuple(state.get_agent_speed(id_agnet))
-        l_option = short_path_policy.optional_next_action(self.d_policy,cur_pos,speed_cur)
-        prob=[]
-        item_action=[]
-        for item in l_option:
-            prob.append(item[1])
-            item_action.append(item[0])
-        a = random.choices(population=item_action,weights=prob)
-        return a[0]
+        tran = self.get_action_move(speed_cur,cur_pos)
+        return tran
+
+    def rearrange_data(self):
+        '''
+        make data set for shortest dist
+        pos : <time_step>
+        '''
+        d={}
+        for ky_start in self.optional_pathz:
+            for ky_goal in self.optional_pathz[ky_start]:
+                for path_i in self.optional_pathz[ky_start][ky_goal]:
+                    for i in range(len(path_i)):
+                        if i == len(path_i)-1:
+                            self.pos_goal.add(path_i[i])
+                        if path_i[i] not in d:
+                            d[path_i[i]] = i
+                        elif d[path_i[i]] == i:
+                            continue
+                        else:
+                            raise Exception('error in short path in function rearrange_data ')
+        self.d_pos_t_step=d
+        print()
+
+
+    def get_next_pos_mover(self,state,id_player):
+        cur_pos = tuple(state.get_agent_position(id_player))
+        speed_cur = tuple(state.get_agent_speed(id_player))
+
+    def get_action_move(self,speed,pos):
+        l_op=[]
+        l_moves = self.get_next_state(speed,pos)
+        if l_moves is None:
+            return l_op
+        for item in l_moves:
+            # if the its a goal pos
+            if item[0] in self.pos_goal:
+                l_op.append(item)
+                continue
+            # else check if there any possible move head
+            res = self.get_next_state(item[1],item[0])
+            if res is not None:
+                l_op.append(item)
+        size =float(len(l_op))
+        for x in l_op:
+            x.append(1/size)
+        return l_op
+
+    def get_next_state(self,speed,pos):
+        l=[]
+        t= self.d_pos_t_step[pos]
+        for action_a in self.action_list_a:
+            skip=False
+            speed_a = [action_a[i] + speed[i] for i in range(len(speed))]
+
+            # if the speed is over the MAX_SPEED
+            for i in range(len(speed_a)):
+                if abs(speed_a[i]) > self.max_speed:
+                    skip=True
+            if skip:
+                continue
+
+            pos_a = [speed_a[i] + pos[i] for i in range(len(speed_a))]
+            pos_a = tuple(pos_a)
+            if pos_a  in self.d_pos_t_step:
+                if t<self.d_pos_t_step[pos_a]:
+                    l.append([pos_a,speed_a,action_a])
+        if len(l)==0:
+            return None
+        return l
 
     def choose_policy_path(self):
         '''
@@ -152,7 +226,7 @@ class short_path_policy:
         self.policy_path=choosen
 
     def get_tran(self):
-        return self.d_policy
+        return self
 
     @staticmethod
     def get_expected_action(state,id_agnet,policy):

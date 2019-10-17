@@ -21,11 +21,12 @@ class agent_player:
         self.policy_object=None
         self.reward=0
         self.ctr_move=0
-
+        self.max_speed = None
 
     def update_reward(self,r):
         self.reward+=r
-
+    def set_max_speed(self,s):
+        self.max_speed=s
     def get_starting_points(self):
         return self.starting_place_list
 
@@ -84,11 +85,11 @@ class agent_player:
         self.policy_object.update_policy(s_old,r,a,s_new,action_obj)
 
 
-    def init_policy(self,pathz=None,policy_name=''):
+    def init_policy(self,pathz=None,policy_name='',max_speed=None):
         if policy_name == 'random':
             self.policy_object = rand_policy()
         if policy_name == 'short':
-            self.policy_object = short_path_policy(pathz)
+            self.policy_object = short_path_policy(pathz,max_speed)
         if policy_name == 'dog':
             self.policy_object = dog()
 
