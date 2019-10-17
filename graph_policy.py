@@ -49,7 +49,7 @@ def add_diagonal_edges(graph_g,x,y):
         if x_i-1 >= 0 and y_i + 1 < y:
             graph_g.add_edge((x_i, y_i), (x_i -1, y_i + 1))
 
-def grid_to_graph(gird,is_diagonal=True):
+def grid_to_graph(gird,is_diagonal=False):
     x=gird.x_size
     y=gird.y_size
     G = nx.grid_2d_graph(x,y)
@@ -141,6 +141,7 @@ class short_path_policy:
         cur_pos = tuple(state.get_agent_position(id_agnet))
         speed_cur = tuple(state.get_agent_speed(id_agnet))
         tran = self.get_action_move(speed_cur,cur_pos)
+
         return tran
 
     def rearrange_data(self):
@@ -162,7 +163,7 @@ class short_path_policy:
                         else:
                             raise Exception('error in short path in function rearrange_data ')
         self.d_pos_t_step=d
-        print()
+
 
 
     def get_next_pos_mover(self,state,id_player):

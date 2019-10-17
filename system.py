@@ -91,7 +91,7 @@ class system_game:
 
         self.copy_agents(self.agents_in,self.agents_out)
         self.agents_in = {'A': [], 'B': []}
-        print ('-'*100)
+        #print ('-'*100)
 
     def set_rtdp(self,agent):
         rtdp_obj = rtdp_algo.rtdp(self.grid_bord)
@@ -117,7 +117,7 @@ class system_game:
     def set_value_itr(self,agent):
         update_num = ceil(sqrt(pow(self.grid_bord.y_size,2)+pow(self.grid_bord.x_size,2)))+1
         update_num = 15
-        print ("update_value:\t{}".format(update_num))
+
         v = value_iteration.value_iteration_object(self.grid_bord)
         v.init_dict_state(self.grid_bord.x_size,self.grid_bord.y_size)
         agent.policy_object = v
@@ -229,7 +229,6 @@ class system_game:
 
         players_wall =  self.current_state.is_wall_state()
         if players_wall is not None:
-            print()
             to_remove = self.id_to_agents(players_wall)
             for p in to_remove:
                 list_to_remove.append(p)
@@ -370,6 +369,7 @@ class system_game:
 
     def loop_game(self,n,num_of_epsidoe=7000,info='_'):
         d_list=[]
+        num_of_epsidoe = num_of_epsidoe + 1
         for i in range(1,num_of_epsidoe):
             #print (i)
             if i%1000==0:
@@ -381,7 +381,7 @@ class system_game:
         df_fin =pd.DataFrame(d_list)
         df_fin.to_csv('{}/N_{}_T_{}_info_{}.csv'.format('/home/ise/car_model',n,time.strftime("%m_%d_%H_%M_%S"),info), sep='\t')
 
-    def eval_policy(self, num_of_iteration=300):
+    def eval_policy(self, num_of_iteration=250):
         d_l = {'collusion': 0, 'goal': 0, 'round': [], 'reward': []}
         for i in range(num_of_iteration):
             self.start_episode()
@@ -399,33 +399,34 @@ class system_game:
 
 
 def generator_game():
-    l=[(4,4001),(5,5001),(6,6001),(7,7001),(8,8001),(9,9001),(10,100001),(11,100001),(12,100001),(13,100001),(14,100001)
-        , (15, 100001),(16,100001),(17,100001),(18,100001),(19,100001),(20,100001),(21,100001),(22,100001)]
-    for item in l:
+    for item in range(5,25):
         speed_A=1
         speed_B=1
-        goal_one,goal_two = np.random.choice(item[0],2,False)
-        if item[0]>10:
+        goal_one,goal_two = np.random.choice(item,2,False)
+        iter_num = item * 1000
+        if item>10:
             speed_A+=1
             speed_B+=1
-        if item[0]>19:
+            iter_num=iter_num*2
+        if item>19:
+            iter_num = iter_num*2
             speed_A+=1
             speed_B+=1
-            
-        str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|rtdp:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1,speed_A,speed_B,
+
+        str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|rtdp:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
 
         print (str_i)
         s = system_game()
         s.init_game(str_i)
-        s.loop_game(item[0],item[1],'G_{}_{}'.format(goal_one,goal_two))
+        s.loop_game(item,iter_num,'G_{}_{}'.format(goal_one,goal_two))
 
-        str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1,speed_A,speed_B,
+        str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
 
         s = system_game()
         s.init_game(str_i)
-        s.loop_game(item[0])
+        s.loop_game(item)
 
 
 
@@ -441,12 +442,12 @@ if __name__ == "__main__":
     #std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 3,0 -A_s 3,3'
     #std_in_string = '-x 3 -y 3 -G 0,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 2,2'
     #std_in_string = '-x 5 -y 5 -G 0,0:3,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 4,4'
-    std_in_string = '-x 4 -y 4 -G 0,0:1,0:3,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 3,3'
-    #std_in_string = '-x 13 -y 13 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|dog:-b|100 -B_s 2,0 -A_s 12,12'
-
+    #std_in_string = '-x 4 -y 4 -G 0,0:1,0:3,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 3,3'
+    #std_in_string = '-x 11 -y 11 -G 4,0:5,0 -A -n|1:-p|short:-b|52:-m|2 -B -n|1:-p|rtdp:-b|100:-m|2 -B_s 1,0 -A_s 10,10'
+    std_in_string='-x 7 -y 7 -G 6,0:4,0 -A -n|1:-p|short:-b|52:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 1,0 -A_s 6,6'
 
     s = system_game()
     s.init_game(std_in_string)
-    s.loop_game(7)
+    s.loop_game(11)
 
     print ("system class")
