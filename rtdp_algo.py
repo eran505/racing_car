@@ -34,6 +34,8 @@ class rtdp:
         self.init_action_map()
         self.dynamic_state_map={}
 
+    def policy_data(self):
+        return "state: {}".format((self.ctr_state))
 
     def init_action_map(self):
         self.action_map =\

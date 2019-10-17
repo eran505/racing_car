@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7a2cf9e7-5059-4257-9acf-3792622dfcbc" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dog_policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/dog_policy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/graph_policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/graph_policy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rtdp_algo.py" beforeDir="false" afterPath="$PROJECT_DIR$/rtdp_algo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/system.py" beforeDir="false" afterPath="$PROJECT_DIR$/system.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -23,7 +24,7 @@
           <file leaf-file-name="state.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/state.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="435">
+                <state relative-caret-position="-1754">
                   <caret line="30" column="28" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="28" />
                   <folding>
                     <element signature="e#2#13#0" expanded="true" />
@@ -35,8 +36,8 @@
           <file leaf-file-name="system.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/system.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-148">
-                  <caret line="369" column="51" lean-forward="true" selection-start-line="369" selection-start-column="51" selection-end-line="369" selection-end-column="51" />
+                <state relative-caret-position="-748">
+                  <caret line="374" column="19" lean-forward="true" selection-start-line="374" selection-start-column="19" selection-end-line="374" selection-end-column="19" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
@@ -47,8 +48,8 @@
           <file leaf-file-name="rtdp_algo.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/rtdp_algo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="4575">
-                  <caret line="311" column="9" selection-start-line="311" selection-start-column="4" selection-end-line="311" selection-end-column="9" />
+                <state relative-caret-position="-3738">
+                  <caret line="37" column="34" selection-start-line="37" selection-start-column="34" selection-end-line="37" selection-end-column="34" />
                   <folding>
                     <element signature="e#1#22#0" expanded="true" />
                   </folding>
@@ -72,11 +73,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="graph_policy.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="graph_policy.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/graph_policy.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="4425">
-                  <caret line="298" column="9" selection-start-line="298" selection-start-column="4" selection-end-line="298" selection-end-column="9" />
+                <state relative-caret-position="207">
+                  <caret line="290" column="33" selection-start-line="290" selection-start-column="33" selection-end-line="290" selection-end-column="33" />
                   <folding>
                     <element signature="e#1#14#0" expanded="true" />
                   </folding>
@@ -84,7 +85,16 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="util_system.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="dog_policy.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/dog_policy.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="405">
+                  <caret line="27" column="19" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="19" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="util_system.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/util_system.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="484">
@@ -96,8 +106,8 @@
           <file leaf-file-name="agnets.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/agnets.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1380">
-                  <caret line="97" selection-start-line="97" selection-end-line="97" />
+                <state relative-caret-position="300">
+                  <caret line="20" column="26" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="26" />
                   <folding>
                     <element signature="e#1#34#0" expanded="true" />
                   </folding>
@@ -159,12 +169,12 @@
         <option value="$PROJECT_DIR$/planner.py" />
         <option value="$PROJECT_DIR$/q_policy.py" />
         <option value="$PROJECT_DIR$/random_policy.py" />
-        <option value="$PROJECT_DIR$/dog_policy.py" />
         <option value="$PROJECT_DIR$/value_iteration.py" />
         <option value="$PROJECT_DIR$/util_system.py" />
         <option value="$PROJECT_DIR$/agnets.py" />
         <option value="$PROJECT_DIR$/state.py" />
         <option value="$PROJECT_DIR$/action.py" />
+        <option value="$PROJECT_DIR$/dog_policy.py" />
         <option value="$PROJECT_DIR$/rtdp_algo.py" />
         <option value="$PROJECT_DIR$/graph_policy.py" />
         <option value="$PROJECT_DIR$/system.py" />
@@ -342,7 +352,7 @@
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.4144806" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.4144806" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -369,12 +379,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/rtdp_algo.py</url>
-          <line>167</line>
+          <line>169</line>
           <option name="timeStamp" value="278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/system.py</url>
-          <line>419</line>
+          <line>426</line>
           <option name="timeStamp" value="288" />
         </line-breakpoint>
       </breakpoints>
@@ -819,47 +829,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dog_policy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/random.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
           <caret line="199" selection-start-line="199" selection-end-line="199" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/agnets.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1380">
-          <caret line="97" selection-start-line="97" selection-end-line="97" />
-          <folding>
-            <element signature="e#1#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/graph_policy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4425">
-          <caret line="298" column="9" selection-start-line="298" selection-start-column="4" selection-end-line="298" selection-end-column="9" />
-          <folding>
-            <element signature="e#1#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rtdp_algo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4575">
-          <caret line="311" column="9" selection-start-line="311" selection-start-column="4" selection-end-line="311" selection-end-column="9" />
-          <folding>
-            <element signature="e#1#22#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -873,16 +846,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/state.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="30" column="28" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="28" />
-          <folding>
-            <element signature="e#2#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/util_system.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="484">
@@ -890,10 +853,57 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/state.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1754">
+          <caret line="30" column="28" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="28" />
+          <folding>
+            <element signature="e#2#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/agnets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="26" selection-start-line="20" selection-start-column="13" selection-end-line="20" selection-end-column="26" />
+          <folding>
+            <element signature="e#1#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rtdp_algo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3738">
+          <caret line="37" column="34" selection-start-line="37" selection-start-column="34" selection-end-line="37" selection-end-column="34" />
+          <folding>
+            <element signature="e#1#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dog_policy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="27" column="19" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/graph_policy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="207">
+          <caret line="290" column="33" selection-start-line="290" selection-start-column="33" selection-end-line="290" selection-end-column="33" />
+          <folding>
+            <element signature="e#1#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/system.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-148">
-          <caret line="369" column="51" lean-forward="true" selection-start-line="369" selection-start-column="51" selection-end-line="369" selection-end-column="51" />
+        <state relative-caret-position="-748">
+          <caret line="374" column="19" lean-forward="true" selection-start-line="374" selection-start-column="19" selection-end-line="374" selection-end-column="19" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

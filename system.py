@@ -367,7 +367,7 @@ class system_game:
                 p.reset_agent()
         self.set_starting_state()
 
-    def loop_game(self,n,num_of_epsidoe=7000,info='_'):
+    def loop_game(self,n,num_of_epsidoe=7000,info_string='_'):
         d_list=[]
         num_of_epsidoe = num_of_epsidoe + 1
         for i in range(1,num_of_epsidoe):
@@ -377,9 +377,10 @@ class system_game:
                 d_list.append({'iter': i,'Avg Rerward':r ,'sum_collusion':sum_col, 'sum_goal':sum_goal,'avg_round':avg_round})
             self.start_episode()
             info, ctr_rounds,r = self.start_game(policy_eval=False)
-            print ('num_of_epsidoe:\t',i)
+            #print ('num_of_epsidoe:\t',i)
+        self.print_policy()
         df_fin =pd.DataFrame(d_list)
-        df_fin.to_csv('{}/N_{}_T_{}_info_{}.csv'.format('/home/ise/car_model',n,time.strftime("%m_%d_%H_%M_%S"),info), sep='\t')
+        df_fin.to_csv('{}/N_{}_T_{}_info_{}.csv'.format('/home/ise/car_model',n,time.strftime("%m_%d_%H_%M_%S"),info_string), sep='\t')
 
     def eval_policy(self, num_of_iteration=250):
         d_l = {'collusion': 0, 'goal': 0, 'round': [], 'reward': []}
@@ -397,9 +398,15 @@ class system_game:
         avg_round = sum(d_l['round']) / float(len(d_l['round']))
         return d_l['collusion'], d_l['goal'], avg_round, avg_reward
 
+    def print_policy(self):
+        for sym in self.agents_in:
+            for p in self.agents_out[sym]:
+                str_info_policy = p.policy_object.policy_data()
+                print (str_info_policy )
+
 
 def generator_game():
-    for item in range(5,25):
+    for item in range(5,22):
         speed_A=1
         speed_B=1
         goal_one,goal_two = np.random.choice(item,2,False)

@@ -92,6 +92,7 @@ class short_path_policy:
         self.name_policy='shortest path'
         self.policy_path=None
         self.starting_p = None
+        self.all_path_number=0
         self.d_policy=None
         self.max_look_head=2
         self.max_speed=absolut_max_speed
@@ -153,6 +154,7 @@ class short_path_policy:
         for ky_start in self.optional_pathz:
             for ky_goal in self.optional_pathz[ky_start]:
                 for path_i in self.optional_pathz[ky_start][ky_goal]:
+                    self.all_path_number+=1
                     for i in range(len(path_i)):
                         if i == len(path_i)-1:
                             self.pos_goal.add(path_i[i])
@@ -285,6 +287,8 @@ class short_path_policy:
             t3 = [small_t[i] + big_t[i] for i in range(len(small_t))]
         return t3
 
+    def policy_data(self):
+        return "path: {}".format((self.all_path_number))
 
 from collections import Counter
 
