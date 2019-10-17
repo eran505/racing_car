@@ -317,7 +317,7 @@ class system_game:
             #print ('\n')
             #self.history.append(str(self.current_state))
             for symbol in self.agents_in:
-                self.print_state()
+                #self.print_state()
                 #print(self.current_state)
                 if is_end:
                     break
@@ -327,11 +327,10 @@ class system_game:
 
                     a = agent_i.play(self.current_state,policy_eval,self.action_drive_object)
 
-                    print(self.current_state)
+                    #print(self.current_state)
 
                     is_removed,info,r,l_remove,fin_state = self.check_conditions()
-                    if agent_i.get_team() == 'B':
-                        print (agent_i.reward)
+
                     #self.update_policy(agent_i, self.previous_state, r, a, self.current_state)
 
                     if is_removed:
@@ -352,11 +351,11 @@ class system_game:
             ctr_rounds+=1
             #print ("round : {}".format(ctr_rounds))
             if is_end:
-                print ('---End Episode---')
+                #print ('---End Episode---')
                 break
 
 
-        print (sum_of_reward)
+        #print (sum_of_reward)
         return info,ctr_rounds,sum_of_reward
 
     def start_episode(self):
@@ -372,7 +371,7 @@ class system_game:
     def loop_game(self,n,num_of_epsidoe=7000,info='_'):
         d_list=[]
         for i in range(1,num_of_epsidoe):
-            print (i)
+            #print (i)
             if i%1000==0:
                 sum_col, sum_goal, avg_round, r = self.eval_policy()
                 d_list.append({'iter': i,'Avg Rerward':r ,'sum_collusion':sum_col, 'sum_goal':sum_goal,'avg_round':avg_round})
@@ -409,7 +408,7 @@ def generator_game():
         if item[0]>10:
             speed_A+=1
             speed_B+=1
-        str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1,speed_A,speed_B,
+        str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|rtdp:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item[0],item[0]-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
 
         print (str_i)
