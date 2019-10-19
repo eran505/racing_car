@@ -7,6 +7,7 @@ from planner import reward_func
 import graph_policy as gp
 import value_iteration
 import time
+import os
 from math import sqrt,ceil
 import rtdp_algo
 import pandas as pd
@@ -378,7 +379,7 @@ class system_game:
             self.start_episode()
             info, ctr_rounds,r = self.start_game(policy_eval=False)
             #print ('num_of_epsidoe:\t',i)
-        self.print_policy()
+        print (self.print_policy())
         df_fin =pd.DataFrame(d_list)
         df_fin.to_csv('{}/N_{}_T_{}_info_{}.csv'.format('/home/ise/car_model',n,time.strftime("%m_%d_%H_%M_%S"),info_string), sep='\t')
 
@@ -399,24 +400,27 @@ class system_game:
         return d_l['collusion'], d_l['goal'], avg_round, avg_reward
 
     def print_policy(self):
+        str_info=''
         for sym in self.agents_in:
             for p in self.agents_out[sym]:
                 str_info_policy = p.policy_object.policy_data()
-                print (str_info_policy )
+                print (str_info_policy)
+
 
 
 def generator_game():
-    for item in range(5,22):
+
+    for item in range(3,21):
         speed_A=1
         speed_B=1
         goal_one,goal_two = np.random.choice(item,2,False)
-        iter_num = item * 1000
+        iter_num = item * 10000
         if item>10:
             speed_A+=1
             speed_B+=1
-            iter_num=iter_num*2
-        if item>19:
-            iter_num = iter_num*2
+            iter_num=iter_num*10
+        if item>15:
+            iter_num = iter_num*10
             speed_A+=1
             speed_B+=1
 
@@ -429,8 +433,9 @@ def generator_game():
         s.loop_game(item,iter_num,'G_{}_{}'.format(goal_one,goal_two))
 
         str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
-                                                                                                                                    goal_one,goal_two)
+                                                                                                                          goal_one,goal_two)
 
+        print(str_i)
         s = system_game()
         s.init_game(str_i)
         s.loop_game(item)
