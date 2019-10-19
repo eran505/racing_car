@@ -404,17 +404,23 @@ class system_game:
         for sym in self.agents_in:
             for p in self.agents_out[sym]:
                 str_info_policy = p.policy_object.policy_data()
+                to_disk(str_info_policy)
                 print (str_info_policy)
 
+def to_disk(msg,path_file='/home/ise/car_model/info.txt'):
+    if os.path.isfile(path_file) is False:
+        os.system('touch {}'.format(path_file))
+    with open(path_file, "a") as myfile:
+        myfile.write(msg+'\n')
 
 
 def generator_game():
 
-    for item in range(3,21):
+    for item in range(3,20):
         speed_A=1
         speed_B=1
         goal_one,goal_two = np.random.choice(item,2,False)
-        iter_num = item * 10000
+        iter_num = item * 1
         if item>10:
             speed_A+=1
             speed_B+=1
@@ -428,14 +434,16 @@ def generator_game():
                                                                                                                                     goal_one,goal_two)
 
         print (str_i)
+        to_disk(str_i)
         s = system_game()
         s.init_game(str_i)
         s.loop_game(item,iter_num,'G_{}_{}'.format(goal_one,goal_two))
 
         str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
-                                                                                                                          goal_one,goal_two)
+                                                                                                                                    goal_one,goal_two)
 
-        print(str_i)
+        print (str_i)
+        to_disk(str_i)
         s = system_game()
         s.init_game(str_i)
         s.loop_game(item)
