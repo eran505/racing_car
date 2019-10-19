@@ -420,7 +420,7 @@ def generator_game():
         speed_A=1
         speed_B=1
         goal_one,goal_two = np.random.choice(item,2,False)
-        iter_num = item * 1
+        iter_num = item * 10000
         if item>10:
             speed_A+=1
             speed_B+=1
