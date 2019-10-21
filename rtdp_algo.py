@@ -50,10 +50,11 @@ class rtdp:
         self.default_actions = [(0,0)]
 
 
-    def full_init(self,x,y,num_agents,max_speed,full,max_b=1):
+    def full_init(self,x,y,num_agents,max_speed,full,max_b=1,frac_mem=5):
         speed_state = pow((abs(max_speed)*2)+1,2)
         state_size_overall = pow(((x * y) + 1) * speed_state * max_b, num_agents)
         print ("state_size_overall: ",state_size_overall )
+        state_size_overall = round(state_size_overall * (float(1)/float(frac_mem)))
         if full is False:
             self.matrix_q = np.full((state_size_overall, len(self.action_map)), self.heuristic_value_upper_bound)
         else:

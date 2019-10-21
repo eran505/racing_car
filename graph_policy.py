@@ -299,5 +299,22 @@ def counter_method(l):
     res = Counter(l)
     return [(k,v/size) for k,v in res.items()]
 
+
+def intWithCommas(x):
+    if type(x) not in [type(0)]:
+        raise TypeError("Parameter must be an integer.")
+    if x < 0:
+        return '-' + intWithCommas(-x)
+    result = ''
+    while x >= 1000:
+        x, r = divmod(x, 1000)
+        result = ",%03d%s" % (r, result)
+    return "%d%s" % (x, result)
+
 if __name__ == "__main__":
     print ("-----MY--------")
+    for i in range(3,20):
+        print ('n=',i,end='\t')
+        speed_state = pow((abs(2) * 2) + 1, 2)
+        size = pow(((i * i) + 1) * speed_state * 1, 2)
+        print (intWithCommas(size))
