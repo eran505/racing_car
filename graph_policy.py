@@ -102,7 +102,8 @@ class short_path_policy:
         self.action_list_a=None
         self.pre_function()
         self.uniform_policy()
-
+        self.dead_end_state={}
+        self.memo_save=None
     def pre_function(self):
         self.action_list_a = [(0, 0), (0, 1), (0, -1), (1, 0), (1, 1), (1, -1), (-1, 0), (-1, 1), (-1, -1)]
 
@@ -122,7 +123,7 @@ class short_path_policy:
 
 
     def rest(self,dict_info):
-        pass
+        self.memo_save=None
 
     def update_policy(self,s_old,r,a,s_new,action_obj):
         pass
@@ -134,14 +135,20 @@ class short_path_policy:
         '''
         [pos, speed, action, uni_probability]
         '''
-        res = self.get_transition(state,id_agnet)
+        res = self.get_transition(state,id_agnet,take_action=True)
         ch = random.randrange(0, len(res), 1)
         return res[ch][-2]
 
-    def get_transition(self,state,id_agnet):
+    def get_transition(self,state,id_agnet,take_action=False):
         cur_pos = tuple(state.get_agent_position(id_agnet))
         speed_cur = tuple(state.get_agent_speed(id_agnet))
-        tran = self.get_action_move(speed_cur,cur_pos)
+
+        tran = self.get_action_move(speed_cur,cur_pos,take_action)
+
+        if len(tran)==0:
+            self.dead_end_state[(speed_cur,cur_pos)]=True
+            tran=[[cur_pos,(0,0),(0,0),1]]
+            state.set_agent_speed(id_agnet,(0,0))
 
         return tran
 
@@ -172,9 +179,17 @@ class short_path_policy:
         cur_pos = tuple(state.get_agent_position(id_player))
         speed_cur = tuple(state.get_agent_speed(id_player))
 
-    def get_action_move(self,speed,pos):
+    def get_memo_state(self,speed,pos):
+        tup = (pos,speed)
+        if tup in self.memo_save:
+            return self.memo_save[tup]
+
+    def get_action_move(self,speed,pos,take_action=True):
         l_op=[]
-        l_moves = self.get_next_state(speed,pos)
+        if self.memo_save is not None and take_action:
+            return self.memo_save
+        else:
+            l_moves = self.get_next_state(speed,pos)
         if l_moves is None:
             return l_op
         for item in l_moves:
@@ -189,6 +204,8 @@ class short_path_policy:
         size =float(len(l_op))
         for x in l_op:
             x.append(1/size)
+        if take_action is False:
+            self.memo_save=l_op
         return l_op
 
     def get_next_state(self,speed,pos):
@@ -197,7 +214,7 @@ class short_path_policy:
         for action_a in self.action_list_a:
             skip=False
             speed_a = [action_a[i] + speed[i] for i in range(len(speed))]
-
+            speed_a = tuple(speed_a)
             # if the speed is over the MAX_SPEED
             for i in range(len(speed_a)):
                 if abs(speed_a[i]) > self.max_speed:
@@ -209,6 +226,8 @@ class short_path_policy:
             pos_a = tuple(pos_a)
             if pos_a  in self.d_pos_t_step:
                 if t<self.d_pos_t_step[pos_a]:
+                    if (speed_a,pos_a) in self.dead_end_state:
+                        continue
                     l.append([pos_a,speed_a,action_a])
         if len(l)==0:
             return None
@@ -230,6 +249,8 @@ class short_path_policy:
 
     def get_tran(self):
         return self
+
+
 
     @staticmethod
     def get_expected_action(state,id_agnet,policy):
@@ -289,6 +310,12 @@ class short_path_policy:
 
     def policy_data(self):
         return "path: {}".format((self.all_path_number))
+
+
+    def pre_calc_tran_dict(self):
+        pass
+
+
 
 from collections import Counter
 

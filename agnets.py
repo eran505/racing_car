@@ -27,6 +27,8 @@ class agent_player:
         self.reward+=r
     def set_max_speed(self,s):
         self.max_speed=s
+    def get_max_speed(self):
+        return self.max_speed
     def get_starting_points(self):
         return self.starting_place_list
 

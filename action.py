@@ -14,6 +14,7 @@ class action_drive:
         self.d_max_speed={}
         self.wall_is_end=True
         self.wall=None
+        self.memo = None
 
     def set_max_speed(self,id_p,speed):
         self.d_max_speed[id_p]=speed
@@ -113,6 +114,7 @@ class action_drive:
         return state_next_states
 
     def get_next_state(self,player_id,action_set):
+        self.memo = None
         s_state = self.cur_state.get_deep_copy_state()
         d_all={}
         for action_a in action_set:
@@ -134,6 +136,7 @@ class action_drive:
 
 
     def get_expected_reward(self,player_id):
+        self.memo=None
         s_state = self.cur_state.get_deep_copy_state()
         #action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
         d_all={}
@@ -163,7 +166,10 @@ class action_drive:
 
 
     def tran_function(self,id_roll='A1',expected=False):
-        list_a = self.tran[id_roll].get_transition(self.cur_state,id_roll)
+        if self.memo is None:
+            list_a = self.tran[id_roll].get_transition(self.cur_state,id_roll)
+            self.memo = list_a
+        list_a=self.memo
         list_state = []
         state_old = self.cur_state.get_deep_copy_state()
         for item in list_a:

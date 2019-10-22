@@ -50,9 +50,11 @@ class rtdp:
         self.default_actions = [(0,0)]
 
 
-    def full_init(self,x,y,num_agents,max_speed,full,max_b=1,frac_mem=5):
-        speed_state = pow((abs(max_speed)*2)+1,2)
-        state_size_overall = pow(((x * y) + 1) * speed_state * max_b, num_agents)
+    def full_init(self,x,y,num_agents,arr_max_speed,full,max_b=1,frac_mem=5):
+        state_size_overall=1
+        for max_speed in arr_max_speed:
+            speed_state = pow((abs(max_speed)*2)+1,2)
+            state_size_overall*= ((x * y) + 1) * speed_state * max_b
         print ("state_size_overall: ",state_size_overall )
         state_size_overall = round(state_size_overall * (float(1)/float(frac_mem)))
         if full is False:
@@ -66,8 +68,8 @@ class rtdp:
 
 
 
-    def init_policy(self,x,y,max_speed=2,player_number=2,full=True):
-        self.full_init(x,y,player_number,max_speed,full)
+    def init_policy(self,x,y,arr_max_speed,player_number=2,full=True):
+        self.full_init(x,y,player_number,arr_max_speed,full)
 
 
 
