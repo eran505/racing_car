@@ -406,6 +406,9 @@ class system_game:
 
         avg_reward = sum(d_l['reward']) / float(len(d_l['reward']))
         avg_round = sum(d_l['round']) / float(len(d_l['round']))
+
+        self.print_policy()
+
         return d_l['collusion'], d_l['goal'], avg_round, avg_reward
 
     def print_policy(self):
@@ -424,7 +427,7 @@ def to_disk(msg,path_file='/home/ise/car_model/info.txt'):
 
 def generator_game():
 
-    for item in range(10,20):
+    for item in range(15,20):
         speed_A=2
         speed_B=1
         goal_one,goal_two = np.random.choice(item,2,False)
@@ -436,7 +439,7 @@ def generator_game():
         if item>15:
             iter_num = iter_num*10
             speed_A+=1
-            speed_B+=1
+            speed_B+=2
 
         str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|rtdp:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
@@ -472,7 +475,7 @@ if __name__ == "__main__":
     std_in_string = '-x 5 -y 5 -G 0,0:3,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 4,4'
     #std_in_string = '-x 4 -y 4 -G 0,0:1,0:3,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 3,3'
     #std_in_string = '-x 11 -y 11 -G 4,0:5,0 -A -n|1:-p|short:-b|52:-m|2 -B -n|1:-p|rtdp:-b|100:-m|2 -B_s 1,0 -A_s 10,10'
-    std_in_string='-x 11 -y 11 -G 3,0:4,0 -A -n|1:-p|short:-b|52:-m|3 -B -n|1:-p|rtdp:-b|100:-m|2 -B_s 1,0 -A_s 10,10'
+    #std_in_string='-x 11 -y 11 -G 3,0:4,0 -A -n|1:-p|short:-b|52:-m|3 -B -n|1:-p|rtdp:-b|100:-m|2 -B_s 1,0 -A_s 10,10'
 
     s = system_game()
     s.init_game(std_in_string)
