@@ -411,7 +411,7 @@ class system_game:
         avg_reward = sum(d_l['reward']) / float(len(d_l['reward']))
         avg_round = sum(d_l['round']) / float(len(d_l['round']))
 
-        self.print_policy()
+        #self.print_policy()
 
         return d_l['collusion'], d_l['goal'], avg_round, avg_reward
 
@@ -428,10 +428,10 @@ class system_game:
             ctr_state_up_date = p.policy_object.ctr_state
             acc+=ctr_state_up_date
         self.stop_arr.append(acc)
-        print (self.stop_arr)
+        #print (self.stop_arr)
         if len(self.stop_arr) == 4:
             if len(set(self.stop_arr)) == 1:
-                print('innn')
+                #print('innn')
                 return True
             self.stop_arr=[]
         return False
@@ -445,7 +445,7 @@ def to_disk(msg,path_file='/home/ise/car_model/info.txt'):
 
 def generator_game():
 
-    for item in range(15,20):
+    for item in range(6,20):
         speed_A=2
         speed_B=1
         goal_one,goal_two = np.random.choice(item,2,False)
