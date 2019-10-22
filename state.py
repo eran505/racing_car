@@ -44,6 +44,8 @@ class game_state:
         return l_wall
 
 
+
+
     def get_agent_speed(self,agent_id):
         return self.speed[agent_id]
 

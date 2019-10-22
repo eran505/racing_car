@@ -25,6 +25,7 @@ class system_game:
         self.agents_in={}
         self.current_state=None
         self.previous_state=None
+        self.stop_arr=[]
 
 
 
@@ -384,6 +385,9 @@ class system_game:
                 print (i)
                 sum_col, sum_goal, avg_round, r = self.eval_policy()
                 d_list.append({'iter': i,'Avg Rerward':r ,'sum_collusion':sum_col, 'sum_goal':sum_goal,'avg_round':avg_round})
+                self.start_episode()
+                if self.is_stop():
+                    break
             self.start_episode()
             info, ctr_rounds,r = self.start_game(policy_eval=False)
             #print ('num_of_epsidoe:\t',i)
@@ -418,6 +422,20 @@ class system_game:
                 to_disk(str_info_policy)
                 print (str_info_policy)
 
+    def is_stop(self):
+        acc=0
+        for p in self.agents['B']:
+            ctr_state_up_date = p.policy_object.ctr_state
+            acc+=ctr_state_up_date
+        self.stop_arr.append(acc)
+        print (self.stop_arr)
+        if len(self.stop_arr) == 4:
+            if len(set(self.stop_arr)) == 1:
+                print('innn')
+                return True
+            self.stop_arr=[]
+        return False
+
 def to_disk(msg,path_file='/home/ise/car_model/info.txt'):
     if os.path.isfile(path_file) is False:
         os.system('touch {}'.format(path_file))
@@ -431,7 +449,7 @@ def generator_game():
         speed_A=2
         speed_B=1
         goal_one,goal_two = np.random.choice(item,2,False)
-        iter_num = item * 4000
+        iter_num = item * 10000
         if item>10:
             speed_A+=1
             speed_B+=1
@@ -463,17 +481,18 @@ def generator_game():
 
 import cProfile
 import time
+from queue import Queue
 if __name__ == "__main__":
 
     generator_game()
     exit()
     #std_in_string = '-x 9 -y 9 -G 0,0:2,0:3,0 -A -n|1:-p|short:-b|52:-m|3 -B -n|1:-p|dog:-b|100:-m|2 -B_s 1,0 -A_s 8,8'
     #std_in_string = '-x 8 -y 8 -G 0,0:5,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 1,0 -A_s 7,7'
-    #std_in_string = '-x 7 -y 7 -G 0,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 6,6'
+    std_in_string = '-x 7 -y 7 -G 0,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 6,6'
     #std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 3,0 -A_s 3,3'
     #std_in_string = '-x 3 -y 3 -G 0,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 2,2'
-    std_in_string = '-x 5 -y 5 -G 0,0:3,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 4,4'
-    #std_in_string = '-x 4 -y 4 -G 0,0:1,0:3,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 3,3'
+    #std_in_string = '-x 5 -y 5 -G 0,0:3,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 4,4'
+    std_in_string = '-x 4 -y 4 -G 0,0:1,0:3,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 3,3'
     #std_in_string = '-x 11 -y 11 -G 4,0:5,0 -A -n|1:-p|short:-b|52:-m|2 -B -n|1:-p|rtdp:-b|100:-m|2 -B_s 1,0 -A_s 10,10'
     #std_in_string='-x 11 -y 11 -G 3,0:4,0 -A -n|1:-p|short:-b|52:-m|3 -B -n|1:-p|rtdp:-b|100:-m|2 -B_s 1,0 -A_s 10,10'
 

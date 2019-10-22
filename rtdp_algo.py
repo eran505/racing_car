@@ -50,7 +50,7 @@ class rtdp:
         self.default_actions = [(0,0)]
 
 
-    def full_init(self,x,y,num_agents,arr_max_speed,full,max_b=1,frac_mem=5):
+    def full_init(self,x,y,num_agents,arr_max_speed,full,max_b=1,frac_mem=3):
         state_size_overall=1
         for max_speed in arr_max_speed:
             speed_state = pow((abs(max_speed)*2)+1,2)

@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7a2cf9e7-5059-4257-9acf-3792622dfcbc" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/state.py" beforeDir="false" afterPath="$PROJECT_DIR$/state.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/system.py" beforeDir="false" afterPath="$PROJECT_DIR$/system.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,7 +24,7 @@
             <entry file="file://$PROJECT_DIR$/graph_policy.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="495">
-                  <caret line="148" selection-start-line="148" selection-end-line="148" />
+                  <caret line="249" column="23" lean-forward="true" selection-start-line="249" selection-start-column="23" selection-end-line="249" selection-end-column="23" />
                   <folding>
                     <element signature="e#1#14#0" expanded="true" />
                   </folding>
@@ -33,8 +35,8 @@
           <file leaf-file-name="state.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/state.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="257">
-                  <caret line="49" column="23" selection-start-line="49" selection-start-column="8" selection-end-line="49" selection-end-column="23" />
+                <state relative-caret-position="302">
+                  <caret line="46" selection-start-line="46" selection-end-line="46" />
                   <folding>
                     <element signature="e#2#13#0" expanded="true" />
                   </folding>
@@ -45,8 +47,8 @@
           <file leaf-file-name="rtdp_algo.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/rtdp_algo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="30">
-                  <caret line="53" selection-start-line="53" selection-end-line="53" />
+                <state relative-caret-position="217">
+                  <caret line="37" column="49" selection-start-line="37" selection-start-column="40" selection-end-line="37" selection-end-column="49" />
                   <folding>
                     <element signature="e#1#22#0" expanded="true" />
                   </folding>
@@ -61,11 +63,20 @@
           <file leaf-file-name="system.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/system.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="682">
-                  <caret line="468" column="4" selection-start-line="468" selection-start-column="4" selection-end-line="468" selection-end-column="4" />
+                <state relative-caret-position="810">
+                  <caret line="487" column="4" selection-start-line="487" selection-start-column="4" selection-end-line="487" selection-end-column="4" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="queue.py" pinned="false" current-in-tab="false">
+            <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/queue.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-125">
+                  <caret line="120" column="11" selection-start-line="120" selection-start-column="8" selection-end-line="120" selection-end-column="11" />
                 </state>
               </provider>
             </entry>
@@ -107,7 +118,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.agents</find>
       <find>agents_in</find>
       <find>choices</find>
       <find>a=</find>
@@ -137,6 +147,7 @@
       <find>get_reward_by_state</find>
       <find>state_to_string_no_budget</find>
       <find>get_expected_reward</find>
+      <find>policy_data</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -150,12 +161,12 @@
         <option value="$PROJECT_DIR$/random_policy.py" />
         <option value="$PROJECT_DIR$/value_iteration.py" />
         <option value="$PROJECT_DIR$/util_system.py" />
-        <option value="$PROJECT_DIR$/state.py" />
         <option value="$PROJECT_DIR$/dog_policy.py" />
         <option value="$PROJECT_DIR$/agnets.py" />
         <option value="$PROJECT_DIR$/rtdp_algo.py" />
         <option value="$PROJECT_DIR$/action.py" />
         <option value="$PROJECT_DIR$/graph_policy.py" />
+        <option value="$PROJECT_DIR$/state.py" />
         <option value="$PROJECT_DIR$/system.py" />
       </list>
     </option>
@@ -368,16 +379,16 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/system.py</url>
-          <line>327</line>
+          <line>328</line>
           <option name="timeStamp" value="307" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/graph_policy.py</url>
-          <line>228</line>
-          <option name="timeStamp" value="310" />
+          <url>file://$PROJECT_DIR$/system.py</url>
+          <line>426</line>
+          <option name="timeStamp" value="315" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="311" />
+      <option name="time" value="316" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -452,13 +463,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/util_system.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1875">
-          <caret line="125" column="9" selection-start-line="125" selection-start-column="4" selection-end-line="125" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/system.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4530">
@@ -829,30 +833,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/rtdp_algo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="53" selection-start-line="53" selection-end-line="53" />
-          <folding>
-            <element signature="e#1#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/random.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="168">
           <caret line="199" selection-start-line="199" selection-end-line="199" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/state.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="49" column="23" selection-start-line="49" selection-start-column="8" selection-end-line="49" selection-end-column="23" />
-          <folding>
-            <element signature="e#2#13#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -876,10 +860,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/state.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="302">
+          <caret line="46" selection-start-line="46" selection-end-line="46" />
+          <folding>
+            <element signature="e#2#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/queue.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-125">
+          <caret line="120" column="11" selection-start-line="120" selection-start-column="8" selection-end-line="120" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/rtdp_algo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="37" column="49" selection-start-line="37" selection-start-column="40" selection-end-line="37" selection-end-column="49" />
+          <folding>
+            <element signature="e#1#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/graph_policy.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="495">
-          <caret line="148" selection-start-line="148" selection-end-line="148" />
+          <caret line="249" column="23" lean-forward="true" selection-start-line="249" selection-start-column="23" selection-end-line="249" selection-end-column="23" />
           <folding>
             <element signature="e#1#14#0" expanded="true" />
           </folding>
@@ -888,8 +899,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/system.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="682">
-          <caret line="468" column="4" selection-start-line="468" selection-start-column="4" selection-end-line="468" selection-end-column="4" />
+        <state relative-caret-position="810">
+          <caret line="487" column="4" selection-start-line="487" selection-start-column="4" selection-end-line="487" selection-end-column="4" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
