@@ -411,7 +411,7 @@ class system_game:
         avg_reward = sum(d_l['reward']) / float(len(d_l['reward']))
         avg_round = sum(d_l['round']) / float(len(d_l['round']))
 
-        #self.print_policy()
+        self.print_policy()
 
         return d_l['collusion'], d_l['goal'], avg_round, avg_reward
 
