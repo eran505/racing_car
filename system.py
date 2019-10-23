@@ -445,7 +445,7 @@ def to_disk(msg,path_file='/home/ise/car_model/info.txt'):
 
 def generator_game():
 
-    for item in range(14,25):
+    for item in range(16,25):
         speed_A=2
         speed_B=1
         goal_one,goal_two = np.random.choice(item,2,False)
@@ -456,8 +456,8 @@ def generator_game():
             iter_num=iter_num*10
         if item>15:
             iter_num = iter_num*10
-            speed_A+=1
-            speed_B+=2
+            speed_A+=2
+            speed_B+=1
 
         str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|rtdp:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
