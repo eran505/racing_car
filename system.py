@@ -468,14 +468,14 @@ def generator_game():
         s.init_game(str_i)
         s.loop_game(item,iter_num,'G_{}_{}'.format(goal_one,goal_two))
 
-        str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
+        #str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
 
-        print (str_i)
-        to_disk(str_i)
-        s = system_game()
-        s.init_game(str_i)
-        s.loop_game(item)
+        #print (str_i)
+        #to_disk(str_i)
+        #s = system_game()
+        #s.init_game(str_i)
+        #s.loop_game(item)
 
 
 
