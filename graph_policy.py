@@ -3,14 +3,14 @@ import random
 import networkx as nx
 import util_system as util
 from numpy import round
-
-def shortest_path(G,strat_point,end_point):
-    max=5000000
+import numpy as np
+def shortest_path(G,strat_point,end_point,max_path=1000000):
     paths = nx.all_shortest_paths(G,source=strat_point,target=end_point)
     all_paths =[]
     for p in paths:
         all_paths.append(p)
-    all_paths = all_paths[:max]
+    if len(all_paths)>max_path:
+        return random.sample(all_paths , k=max_path)
     return all_paths
 
 def shortest_path_plus(G,start,end,plus=1):
