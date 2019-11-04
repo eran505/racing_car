@@ -462,7 +462,7 @@ def generator_game():
         speed_A=2
         speed_B=1
         #goal_one,goal_two = np.random.choice(item,2,False)
-        goal_one, goal_two=2,0
+        goal_one, goal_two=item-2,0
         iter_num = item * 12000
         if item>=10:
             speed_A+=1
@@ -480,7 +480,7 @@ def generator_game():
         to_disk(str_i)
         s = system_game()
         s.init_game(str_i)
-        s.loop_game(item,iter_num,'uG_{}_{}'.format(goal_one,goal_two))
+        s.loop_game(item,iter_num,'G_{}_{}'.format(goal_one,goal_two))
 
         str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
