@@ -104,7 +104,7 @@ class system_game:
 
     def set_rtdp(self,agent):
         arr_max_speed=self.get_max_speed_from_all_players()
-        rtdp_obj = rtdp_algo.rtdp(self.grid_bord)
+        rtdp_obj = rtdp_algo.rtdp(self.grid_bord,agent.get_max_speed())
         rtdp_obj.init_policy(self.grid_bord.x_size,self.grid_bord.y_size,arr_max_speed)
         agent.policy_object=rtdp_obj
 
@@ -242,6 +242,7 @@ class system_game:
             to_remove = self.id_to_agents(players_wall)
             for p in to_remove:
                 list_to_remove.append(p)
+            #print ('Wall')
             return True,'Wall',0,list_to_remove,True
 
 
@@ -304,7 +305,7 @@ class system_game:
         return True
 
     def rollback(self):
-        print ('rollback')
+        #print ('rollback')
         self.current_state.state_rollback_exclude_budget(self.previous_state)
 
     def remove_players_list(self,l_to_remove):
@@ -326,7 +327,7 @@ class system_game:
             #print ('\n')
             #self.history.append(str(self.current_state))
             for symbol in self.agents_in:
-                #self.print_state()
+
                 if is_end:
                     break
                 for agent_i in self.agents_in[symbol]:
@@ -334,7 +335,8 @@ class system_game:
                     self.previous_state = self.current_state.get_deep_copy_state()
 
                     a = agent_i.play(self.current_state,policy_eval,self.action_drive_object)
-                    #print (str(agent_i),"=",a)
+                    #print (str(agent_i),"\tAction=",a)
+                    #self.print_state()
                     #print(self.current_state)
 
                     is_removed,info,r,l_remove,fin_state = self.check_conditions()
@@ -371,32 +373,37 @@ class system_game:
         self.copy_agents(self.agents_out,self.agents_in)
         self.agents_out={'A':[],'B':[]}
 
-        for sym in self.agents_in:
-            for p in self.agents_in[sym]:
-                p.reset_agent()
+
+        for p in self.agents_in['B']:
+            p.reset_agent(info=self.action_drive_object)
+
+        for p in self.agents_in['A']:
+            p.reset_agent(info=self.action_drive_object)
+
         self.set_starting_state()
 
     def loop_game(self,n,num_of_epsidoe=7000,info_string='_'):
         d_list=[]
         num_of_epsidoe = num_of_epsidoe + 1
         for i in range(1,num_of_epsidoe):
-            #print (i)
             if i%1000==0:
                 print (i)
-                sum_col, sum_goal, avg_round, r = self.eval_policy()
-                d_list.append({'iter': i,'Avg Rerward':r ,'sum_collusion':sum_col, 'sum_goal':sum_goal,'avg_round':avg_round})
+                sum_col,wall_sum, sum_goal, avg_round, r = self.eval_policy()
+                d_list.append({'iter': i,'Avg Rerward':r ,'wall_sum':wall_sum,'sum_collusion':sum_col, 'sum_goal':sum_goal,'avg_round':avg_round})
                 self.start_episode()
                 if self.is_stop():
                     break
             self.start_episode()
             info, ctr_rounds,r = self.start_game(policy_eval=False)
             #print ('num_of_epsidoe:\t',i)
-        print (self.print_policy())
+        time_now=time.strftime("%m_%d_%H_%M_%S")
+        name_file = 'N_{}_T_{}_info_{}'.format(n,time_now,info_string)
+        print (self.print_policy(name_file))
         df_fin =pd.DataFrame(d_list)
-        df_fin.to_csv('{}/N_{}_T_{}_info_{}.csv'.format('/home/ise/car_model',n,time.strftime("%m_%d_%H_%M_%S"),info_string), sep='\t')
+        df_fin.to_csv('{}/{}.csv'.format('/home/ise/car_model',name_file), sep='\t')
 
-    def eval_policy(self, num_of_iteration=250):
-        d_l = {'collusion': 0, 'goal': 0, 'round': [], 'reward': []}
+    def eval_policy(self, num_of_iteration=400):
+        d_l = {'collusion': 0,'Wall':0, 'goal': 0, 'round': [], 'reward': []}
 
         for i in range(num_of_iteration):
             self.start_episode()
@@ -405,20 +412,24 @@ class system_game:
             d_l['reward'].append(r)
             if info == 'collusion':
                 d_l['collusion'] += 1
+            elif info == 'Wall':
+                d_l['Wall'] += 1
             else:
                 d_l['goal'] += 1
 
         avg_reward = sum(d_l['reward']) / float(len(d_l['reward']))
+        print ('avg_reward :\t',avg_reward)
         avg_round = sum(d_l['round']) / float(len(d_l['round']))
 
-        self.print_policy()
+        #self.print_policy()
 
-        return d_l['collusion'], d_l['goal'], avg_round, avg_reward
+        return d_l['collusion'],d_l['Wall'] ,d_l['goal'], avg_round, avg_reward
 
-    def print_policy(self):
+    def print_policy(self,name):
+        to_file_dist = '{}/{}/{}'.format('/home/ise/car_model','data',name)
         for sym in self.agents_in:
             for p in self.agents_out[sym]:
-                str_info_policy = p.policy_object.policy_data()
+                str_info_policy = p.policy_object.policy_data(to_file_dist)
                 to_disk(str_info_policy)
                 print (str_info_policy)
 
@@ -443,14 +454,17 @@ def to_disk(msg,path_file='/home/ise/car_model/info.txt'):
         myfile.write(msg+'\n')
 
 
+
+
 def generator_game():
 
-    for item in range(10,17):
+    for item in range(8,9):
         speed_A=2
         speed_B=1
-        goal_one,goal_two = np.random.choice(item,2,False)
-        iter_num = item * 1000000
-        if item>10:
+        #goal_one,goal_two = np.random.choice(item,2,False)
+        goal_one, goal_two=2,0
+        iter_num = item * 12000
+        if item>=10:
             speed_A+=1
             speed_B+=1
             iter_num=iter_num*10
@@ -466,7 +480,7 @@ def generator_game():
         to_disk(str_i)
         s = system_game()
         s.init_game(str_i)
-        s.loop_game(item,iter_num,'G_{}_{}'.format(goal_one,goal_two))
+        s.loop_game(item,iter_num,'uG_{}_{}'.format(goal_one,goal_two))
 
         str_i='-x {0} -y {0} -G {4},0:{5},0 -A -n|1:-p|short:-b|52:-m|{2} -B -n|1:-p|dog:-b|100:-m|{3} -B_s 1,0 -A_s {1},{1}'.format(item,item-1,speed_A,speed_B,
                                                                                                                                     goal_one,goal_two)
@@ -484,21 +498,26 @@ import time
 from queue import Queue
 if __name__ == "__main__":
 
+
     generator_game()
     exit()
-    #std_in_string = '-x 9 -y 9 -G 0,0:2,0:3,0 -A -n|1:-p|short:-b|52:-m|3 -B -n|1:-p|dog:-b|100:-m|2 -B_s 1,0 -A_s 8,8'
+    #std_in_string = '-x 9 -y 9 -G 7,0 -A -n|1:-p|short:-b|52:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 0,1 -A_s 8,8'
     #std_in_string = '-x 8 -y 8 -G 0,0:5,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 1,0 -A_s 7,7'
-    std_in_string = '-x 7 -y 7 -G 0,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 6,6'
+    #std_in_string = '-x 7 -y 7 -G 0,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 6,6'
     #std_in_string = '-x 4 -y 4 -G 0,0 -A -n|1:-p|short:-b|50 -B -n|1:-p|rtdp:-b|100 -B_s 3,0 -A_s 3,3'
     #std_in_string = '-x 3 -y 3 -G 0,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 2,2'
-    #std_in_string = '-x 5 -y 5 -G 0,0:3,0 -A -n|1:-p|short:-b|50:-m|2 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 4,4'
-    std_in_string = '-x 4 -y 4 -G 0,0:1,0:3,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 3,3'
-    #std_in_string = '-x 11 -y 11 -G 4,0:5,0 -A -n|1:-p|short:-b|52:-m|2 -B -n|1:-p|rtdp:-b|100:-m|2 -B_s 1,0 -A_s 10,10'
+    #std_in_string = '-x 5 -y 5 -G 0,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 4,4'
+    #std_in_string = '-x 4 -y 4 -G 2,0 -A -n|1:-p|short:-b|10:-m|1 -B -n|1:-p|rtdp:-b|10:-m|1 -B_s 2,0 -A_s 3,3'
+    #std_in_string = '-x 6 -y 6 -G 0,0  -A -n|1:-p|short:-b|52:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 1,0 -A_s 5,5'
     #std_in_string='-x 11 -y 11 -G 3,0:4,0 -A -n|1:-p|short:-b|52:-m|3 -B -n|1:-p|rtdp:-b|100:-m|2 -B_s 1,0 -A_s 10,10'
+    std_in_string = '-x 5 -y 5 -G 0,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 2,0 -A_s 4,4'
+    #std_in_string = '-x 8 -y 8 -G 6,0:0,0 -A -n|1:-p|short:-b|50:-m|1 -B -n|1:-p|rtdp:-b|100:-m|1 -B_s 6,0 -A_s 7,7'
 
     s = system_game()
     s.init_game(std_in_string)
-    s.loop_game(11, 30000)
+    s.loop_game(9, 1000)
+
+
     exit()
     #cProfile.runctx("s.loop_game(11,5000)", globals(), locals())
     #print ("system class")

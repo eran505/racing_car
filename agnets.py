@@ -47,6 +47,8 @@ class agent_player:
         self.budget = int(self.start_budget)
         if self.policy_name=='value':
             self.policy_object.rest(info)
+        elif self.policy_name=='rtdp':
+            self.policy_object.rest(info)
         else:
             self.policy_object.rest({'start': self.starting_point})
         self.reward=0

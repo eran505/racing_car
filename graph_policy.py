@@ -4,12 +4,15 @@ import networkx as nx
 import util_system as util
 from numpy import round
 import numpy as np
-def shortest_path(G,strat_point,end_point,max_path=1000000):
+
+
+def shortest_path(G,strat_point,end_point,max_path=100000):
     paths = nx.all_shortest_paths(G,source=strat_point,target=end_point)
     all_paths =[]
     for p in paths:
         all_paths.append(p)
     if len(all_paths)>max_path:
+        print ('ALL PATH:\t',intWithCommas(len(all_paths)))
         return random.sample(all_paths , k=max_path)
     return all_paths
 
@@ -152,6 +155,14 @@ class short_path_policy:
             state.set_agent_speed(id_agnet,(0,0))
 
         return tran
+
+
+    def hurstic(self,state,id_agnet='A1'):
+        cur_pos = tuple(state.get_agent_position(id_agnet))
+        speed_cur = tuple(state.get_agent_speed(id_agnet))
+        l_op = []
+        l_moves = self.get_next_state(speed_cur, cur_pos)
+        return l_moves
 
     def rearrange_data(self):
         '''
@@ -309,7 +320,10 @@ class short_path_policy:
             t3 = [small_t[i] + big_t[i] for i in range(len(small_t))]
         return t3
 
-    def policy_data(self):
+    def policy_data(self,info):
+        f = open("{}_sp.pkl".format(info), "wb")
+        pickle.dump(self.d_pos_t_step, f)
+        f.close()
         return "path: {}".format((self.all_path_number))
 
 
@@ -319,7 +333,7 @@ class short_path_policy:
 
 
 from collections import Counter
-
+import pickle
 
 
 def counter_method(l):
@@ -339,8 +353,21 @@ def intWithCommas(x):
         result = ",%03d%s" % (r, result)
     return "%d%s" % (x, result)
 
+class GGrid:
+
+    def __init__(self,x,y):
+        self.x_size=x
+        self.y_size = y
+
+
 if __name__ == "__main__":
     print ("-----MY--------")
+    s=5
+    gird_i = GGrid(s,s)
+    res = get_short_path_from_grid(gird_i,(0,0),(s-1,s-1))
+    print (intWithCommas(len(res)))
+    print('end')
+    exit()
     for i in range(3,20):
         print ('n=',i,end='\t')
         speed_state = pow((abs(2) * 2) + 1, 2)

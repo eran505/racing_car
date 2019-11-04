@@ -34,7 +34,7 @@ class action_drive:
         self.cur_state=state
 
     def execute_action(self,id_p):
-        self.stochastic_action(id_p)
+        #self.stochastic_action(id_p)
         r = self.apply_action(id_p)
         return r
 
@@ -164,6 +164,36 @@ class action_drive:
                 d_all[action_a]=([(str_state,float(r),1.0)],float(r),is_wall_state)
         return d_all
 
+
+
+    def get_expected_reward_by_action(self,player_id,action_a):
+        self.memo=None
+        s_state = self.cur_state.get_deep_copy_state()
+        #action_list = [(0,0),(0,1),(0,-1),(1,1),(1,0),(1,-1),(-1,-1),(-1,1),(-1,0)]
+        d_all={}
+        for action_a in [action_a]:
+            is_wall_state=False
+            self.speed_to_add=action_a
+            self.cur_state = s_state.get_deep_copy_state()
+            self.apply_action(player_id)
+            r = self.step_cost
+            reward = self.cur_state.get_reward_by_state()
+
+            if reward == 0:
+                if self.wall is True:
+                    is_wall_state=True
+                    r += self.cur_state.wall_reward
+                    if self.wall_is_end:
+                        str_state = self.cur_state.state_to_string_no_budget()
+                        d_all[action_a] = ([(str_state,0, 1.0)], float(r), is_wall_state)
+                        continue
+                l_str_states = self.tran_function()
+                #r += self.step_cost
+                d_all[action_a] = (l_str_states, float(r),is_wall_state)
+            else:
+                str_state=self.cur_state.state_to_string_no_budget()
+                d_all[action_a]=([(str_state,0,1.0)],float(r)+reward,is_wall_state)
+        return d_all
 
     def tran_function(self,id_roll='A1',expected=False):
         if self.memo is None:

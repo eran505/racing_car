@@ -136,9 +136,12 @@ class game_state:
             p = self.player_position[ky]
             s = self.speed[ky]
             b = self.player_budget[ky]
-            str_ky = "{}_{}_{}_{}".format(ky,tuple(p),tuple(s),b)
+            str_ky = "{}_{}_{}_{}".format(ky,tuple(p),tuple(s),10)
             list_p.append(str_ky)
         return "|".join(list_p)
+
+    def get_deep_copy(self):
+        return copy.deepcopy(self)
 
     def get_deep_copy_state(self):
         #copy.deepcopy =
@@ -201,3 +204,4 @@ class game_state:
             str_ky = "{}_{}_{}_{}".format(ky,tuple(p),tuple(s),budget)
             list_p.append(str_ky)
         return "|".join(list_p)
+

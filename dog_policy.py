@@ -25,5 +25,5 @@ class dog:
     def get_tran(self):
         return None
 
-    def policy_data(self):
+    def policy_data(self,info):
         return "dog"

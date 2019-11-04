@@ -2,6 +2,7 @@
 
 from ast import literal_eval
 
+from math import sqrt
 
 def stdin_str_to_dict(str_in,splitby=' '):
     d={}
@@ -124,6 +125,42 @@ def is_valid_path(path_s):
         new_speed = diff_tuple(speed, diff, minus=False)
         speed = new_speed
     print ('OK')
+
+
+
+
+
+def euclidean_distance(point_A,point_B):
+    result=0
+    for i in range(len(point_A)):
+        result+=(point_A[i] - point_B[i]) ** 2
+
+    result = sqrt(result)
+
+    return  result
+
+def manhattan_distance(point_A,point_B):
+    result = 0
+    for i in range(len(point_A)):
+        result += abs(point_A[i] - point_B[i])
+
+    return result
+
+
+def distance_max(point_A,point_B):
+    result = []
+    for i in range(len(point_A)):
+        result .append(abs(point_A[i] - point_B[i]))
+
+    return max(result)
+
+
+def distance_min(point_A,point_B):
+    result = []
+    for i in range(len(point_A)):
+        result .append(abs(point_A[i] - point_B[i]))
+
+    return min(result)
 
 import time
 
