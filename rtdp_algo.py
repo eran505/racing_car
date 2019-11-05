@@ -347,6 +347,13 @@ class rtdp:
         pass
 
 
+    def loader(self,path_Q,path_map):
+        data = np.load(path_Q)
+        with open(path_map, 'rb') as handle:
+            b = pickle.load(handle)
+        self.map_state=b
+        self.matrix_q=data
+
 
 if __name__ == "__main__":
     #print ('RTDP')
