@@ -53,7 +53,7 @@ class rtdp:
 
         self.action_map_rev = {v: k for k, v in self.action_map .items()}
         self.transaction_action=np.zeros(len(self.action_map))
-        self.transaction_action[self.action_map[(0,0)]]=0.1
+        self.transaction_action[self.action_map[(0,0)]]=0.3
         self.sum_tran_p = np.sum(self.transaction_action)
         self.size_action = len(self.action_map)
         self.default_actions = [(0,0)]
@@ -151,7 +151,7 @@ class rtdp:
 
     def get_action(self,state, player_id,policy_eval,action_a):
         action_a_ch = self.get_max_action(state)
-        ##action_a_ch=(1,0)
+        ##action_a_ch=(0,0)
         if policy_eval is False:
             self.up_date_action_stae(action_a_ch,state.state_to_string_no_budget(),action_a,player_id)
 
@@ -347,12 +347,13 @@ class rtdp:
         pass
 
 
-    def loader(self,path_Q,path_map):
-        data = np.load(path_Q)
-        with open(path_map, 'rb') as handle:
+    def loader(self,argz):
+        data = np.load(argz[0])
+        with open(argz[1], 'rb') as handle:
             b = pickle.load(handle)
-        self.map_state=b
+        self.dynamic_state_map=b
         self.matrix_q=data
+        self.ctr_state=len(self.dynamic_state_map)
 
 
 if __name__ == "__main__":

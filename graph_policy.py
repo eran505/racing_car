@@ -108,11 +108,20 @@ class short_path_policy:
         self.uniform_policy()
         self.dead_end_state={}
         self.memo_save=None
+
+
+
+
+
+
     def pre_function(self):
         self.action_list_a = [(0, 0), (0, 1), (0, -1), (1, 0), (1, 1), (1, -1), (-1, 0), (-1, 1), (-1, -1)]
 
 
+    def loader(self,path):
 
+        with open(path[0], 'rb') as handle:
+            self.d_pos_t_step = pickle.load(handle)
 
     def uniform_policy(self):
         self.rearrange_data()
@@ -140,15 +149,21 @@ class short_path_policy:
         [pos, speed, action, uni_probability]
         '''
         res = self.get_transition(state,id_agnet,take_action=True)
-        ch = random.randrange(0, len(res), 1)
-        return res[ch][-2]
+        prob_l = [item[-1] for item in res]
+        action_l = [item[-2] for item in res]
+
+        ch = random.choices(action_l,prob_l)
+
+        #ch = random.randrange(0, len(res), 1)
+        #return res[ch][-2]
+        return ch[0]
 
     def get_transition(self,state,id_agnet,take_action=False):
         cur_pos = tuple(state.get_agent_position(id_agnet))
         speed_cur = tuple(state.get_agent_speed(id_agnet))
 
         tran = self.get_action_move(speed_cur,cur_pos,take_action)
-
+        tran = self.stochastic_move(tran)
         if len(tran)==0:
             self.dead_end_state[(speed_cur,cur_pos)]=True
             tran=[[cur_pos,(0,0),(0,0),1]]
@@ -156,12 +171,50 @@ class short_path_policy:
 
         return tran
 
+    def stochastic_move(self,list_tran):
+        p_max = 0.6
+        l_moves={}
+        l_tran_prob=[]
+        for item in list_tran:
+            pos= item[0]
+            t_i = self.d_pos_t_step[pos]
+            if t_i not in l_moves:
+                l_moves[t_i]=[]
+            l_moves[t_i].append(item)
+        k_y = l_moves.keys()
+        items_list = l_moves.values()
+        size = len(k_y)
+        if size>1:
+            max_key =max(list(k_y))
+            size_max = len(l_moves[max_key])
+            for item_i in l_moves[max_key]:
+                item_i[-1]=round(p_max/float(size_max),6)
+            p_left_over = (1.0-p_max)/(size-1)
+            for key in k_y:
+                if key==max_key:
+                    continue
+                size_list = len(l_moves[key])
+                for item_i in l_moves[key]:
+                    item_i[-1]=round(p_left_over/float(size_list),6)
+        fin_l=[]
+        for ky_i in l_moves:
+            fin_l.extend(l_moves[ky_i])
+
+        return fin_l
+
+
+
 
     def hurstic(self,state,id_agnet='A1'):
         cur_pos = tuple(state.get_agent_position(id_agnet))
         speed_cur = tuple(state.get_agent_speed(id_agnet))
-        l_op = []
+
+
         l_moves = self.get_next_state(speed_cur, cur_pos)
+
+        if l_moves is None:
+            l_moves = [[cur_pos,(0,0),(0,0)]]
+            #print(state)
         return l_moves
 
     def rearrange_data(self):
@@ -213,6 +266,9 @@ class short_path_policy:
             res = self.get_next_state(item[1],item[0])
             if res is not None:
                 l_op.append(item)
+
+
+
         size =float(len(l_op))
         for x in l_op:
             x.append(1/size)
