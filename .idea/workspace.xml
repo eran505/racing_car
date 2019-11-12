@@ -5,10 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7a2cf9e7-5059-4257-9acf-3792622dfcbc" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/gui_util.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graph_policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/graph_policy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rtdp_algo.py" beforeDir="false" afterPath="$PROJECT_DIR$/rtdp_algo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/system.py" beforeDir="false" afterPath="$PROJECT_DIR$/system.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,8 +21,8 @@
           <file leaf-file-name="graph_policy.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/graph_policy.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="185">
-                  <caret line="280" selection-start-line="280" selection-end-line="280" />
+                <state relative-caret-position="120">
+                  <caret line="8" column="54" selection-start-line="8" selection-start-column="54" selection-end-line="8" selection-end-column="54" />
                   <folding>
                     <element signature="e#1#14#0" expanded="true" />
                   </folding>
@@ -71,11 +67,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="system.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="system.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/system.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="65">
-                  <caret line="494" column="34" lean-forward="true" selection-start-line="494" selection-start-column="34" selection-end-line="494" selection-end-column="34" />
+                <state relative-caret-position="244">
+                  <caret line="483" column="27" selection-start-line="483" selection-start-column="27" selection-end-line="483" selection-end-column="27" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
@@ -95,11 +91,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="bord_game.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="bord_game.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/bord_game.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-390">
-                  <caret line="10" column="22" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="22" />
+                <state relative-caret-position="570">
+                  <caret line="89" column="28" lean-forward="true" selection-start-line="89" selection-start-column="28" selection-end-line="89" selection-end-column="28" />
                 </state>
               </provider>
             </entry>
@@ -379,11 +375,11 @@
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.36201468" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.36201468" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.26967472" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.26967472" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -424,8 +420,13 @@
           <line>364</line>
           <option name="timeStamp" value="418" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/system.py</url>
+          <line>546</line>
+          <option name="timeStamp" value="419" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="419" />
+      <option name="time" value="420" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -895,16 +896,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/graph_policy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="280" selection-start-line="280" selection-end-line="280" />
-          <folding>
-            <element signature="e#1#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/rtdp_algo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1860">
@@ -915,20 +906,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/system.py">
+    <entry file="file://$PROJECT_DIR$/bord_game.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="494" column="34" lean-forward="true" selection-start-line="494" selection-start-column="34" selection-end-line="494" selection-end-column="34" />
+        <state relative-caret-position="570">
+          <caret line="89" column="28" lean-forward="true" selection-start-line="89" selection-start-column="28" selection-end-line="89" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/graph_policy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="54" selection-start-line="8" selection-start-column="54" selection-end-line="8" selection-end-column="54" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#1#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bord_game.py">
+    <entry file="file://$PROJECT_DIR$/system.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-390">
-          <caret line="10" column="22" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="22" />
+        <state relative-caret-position="244">
+          <caret line="483" column="27" selection-start-line="483" selection-start-column="27" selection-end-line="483" selection-end-column="27" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

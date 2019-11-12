@@ -14,7 +14,7 @@ import pandas as pd
 import numpy as np
 from action import action_drive
 
-import gui_util
+#import gui_util
 
 class system_game:
 
@@ -481,11 +481,11 @@ def to_disk(msg,path_file='/home/ise/car_model/info.txt'):
 
 def generator_game():
 
-    for item in range(12,7):
+    for item in range(12,20):
         speed_A=2
         speed_B=1
         #goal_one,goal_two = np.random.choice(item,2,False)
-        goal_one, goal_two=item-2,0
+        goal_one, goal_two=2,0
         iter_num = item * 1500
         if item>=10:
             speed_A+=1
